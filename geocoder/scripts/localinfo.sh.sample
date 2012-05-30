@@ -1,0 +1,24 @@
+#!/bin/sh
+
+#Your Country
+COUNTRY=colombia
+#Database User
+DBUSER=osm
+#Database password
+DBPASS=osm
+#Database owner, osmosis and java issue
+DBSUPR=postgres
+#Database owner password, osmosis and java issue
+DBPSUP=postgres
+#Database host
+DBHOST=localhost
+#Osmosis scripts PATH
+OSMOSISPATHSCRIPTS=/usr/share/doc/osmosis/examples/
+#Osmosis Binary Path
+OSMOSIS=/usr/bin/osmosis
+#Working Database name
+OLDDB=osm
+#Volatile Database name
+DBNAME=osm2
+
+
