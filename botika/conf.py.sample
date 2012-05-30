@@ -1,0 +1,22 @@
+#The name of your application
+APPID = u"botika fixer"
+
+#Your Bot OSM name
+USER = u"botikaXXXX"
+
+#Your Bot OSM password
+PASSWORD = u"SuperSecret"
+
+#The api you must reach for production use
+API = u"api.openstreetmap.org"
+
+#The comment in the changesets
+CHANGESETAUTOTAGS = {u"comment":u"Fixing Street Names"}
+
+#Your user database
+DBUSER = u"osm"
+
+#Your password database
+DBPASS = u"XXXXXXXXX"
+
+#You can also configure : DBHOST, DBNAME, 
