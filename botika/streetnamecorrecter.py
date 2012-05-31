@@ -116,8 +116,9 @@ def applychanges(conn,client,replacements,countquery,onequery,kmeansquery,operat
         mydict,newdict = selectstreets(conn.cursor(),client,k,v,countquery,onequery,kmeansquery,operation)
         logging.info(u"To process {0}".format(len(newdict)))
         for group in mydict.values():
+            CHANGESETAUTOTAGS[u'comment'] = u"Fixing Street Names ({0})".format(v)
             l = client.ChangesetCreate(CHANGESETAUTOTAGS)
-            logging.info("Processing changeset {0}".format(l))
+            logging.info("Processing changeset {0} : {1} -> {2} ".format(l,k,v))
             cont = 0
             for idw in group :
                 if idw in newdict :
