@@ -143,7 +143,7 @@ def fixstreetname(oldw,updw,replacement):
 def fixwaynames():
     CHANGESETAUTOTAGS[u'comment'] = u"Fixing Street Names"
     replacements = {
-    "CAR|CRA|CR|KR|KRA|CRA\.|KRA\.|CARRERA|CARREA|K|CARREAR|ARRERA|CARREARA" : "Carrera",
+    "CAR|CRA|CR|KR|KRA|CRA\.|KRA\.|CARRERRA|CARREA|K|CARREAR|ARRERA|CARREARA" : "Carrera",
     "CL|CLL|CL\.|CALE|CALL|CALLEL|CALLOE|CLLE" : "Calle",
     "DG|DIAG|DIAG\.|DGN" : "Diagonal",
     "TR|TRANS|TV|TRAV|TRV|TRANSV\.|TRANSVEERSAL|TRA|TRANSV" : "Transversal",
