@@ -94,7 +94,7 @@ def selectstreets(cursor,client,regchange,replacement,countquery,onequery,kmeans
             updw = operation(y,updw,replacement)
             if updw is not None : newdict[updw[u'id']] = updw
             cont += 1
-            if cont % 50 == 0: logging.info("Updated 50")
+            #if cont % 50 == 0: logging.info("Updated 50")
     return mydict,newdict
 
 logging.basicConfig(filename=LOGFILE,format=FORMAT,level=logging.DEBUG)
@@ -110,12 +110,11 @@ def applychanges(conn,client,replacements,countquery,onequery,kmeansquery,operat
     operation : function that gets the old record, the new one and a replacement, returns None if the change does not apply and the new record when does    
     """
     cant = 0
-    logging.info("Starting batch")
+    #logging.info("Starting batch")
     for k,v in replacements.iteritems() :
         logging.info("Replacing {0} by {1}".format(k,v))
         mydict,newdict = selectstreets(conn.cursor(),client,k,v,countquery,onequery,kmeansquery,operation)
         logging.info(u"To process {0}".format(len(newdict)))
-        return
         for group in mydict.values():
             l = client.ChangesetCreate(CHANGESETAUTOTAGS)
             logging.info("Processing changeset {0}".format(l))
@@ -127,7 +126,7 @@ def applychanges(conn,client,replacements,countquery,onequery,kmeansquery,operat
                     updw[u'changeset'] = unicode(l)
                     neww = client.WayUpdate(updw)
                     cant += 1
-                if cont % 50 == 0: logging.info("Saved 50")
+                #if cont % 50 == 0: logging.info("Saved 50")
             client.ChangesetClose()
             logging.info("Saved changeset {0}".format(l))
     logging.info("Total Ways Processed :-> {0}".format(cant))
@@ -142,11 +141,14 @@ def fixstreetname(oldw,updw,replacement):
     return updw
 
 def fixwaynames():
+    CHANGESETAUTOTAGS[u'comment'] = u"Fixing Street Names"
     replacements = {
-        "CRA|CR|KR|KRA" : "Carrera",
-        "CL|CLL" : "Calle",
-        "DG|DIAG" : "Diagonal",
-        "TR|TRANS|TV" : "Transversal",
+    "CAR|CRA|CR|KR|KRA|CRA\.|KRA\.|CARRERA|CARREA|K|CARREAR|ARRERA|CARREARA" : "Carrera",
+    "CL|CLL|CL\.|CALE|CALL|CALLEL|CALLOE|CLLE" : "Calle",
+    "DG|DIAG|DIAG\.|DGN" : "Diagonal",
+    "TR|TRANS|TV|TRAV|TRV|TRANSV\.|TRANSVEERSAL|TRA|TRANSV" : "Transversal",
+    "AV\.|AV" : "Avenida",
+    "TROCAL" : "Troncal",
         }
     applychanges(
         conn,
@@ -157,4 +159,24 @@ def fixwaynames():
         "SELECT kmeans(ARRAY[ST_X(l.p), ST_Y(l.p)], {0}) OVER (), l.id, l.name FROM (SELECT id,tags -> 'name' AS name, ST_PointN(linestring,1) AS p FROM ways WHERE tags ?& Array['highway','name'] AND tags -> 'name' ~* '^({1}) .*') AS l ORDER BY kmeans,name;",
         fixstreetname)
 
+def fixmunicipalityattribution(oldw,updw,replacement):
+    updw[u'tag'][u'source'] = replacement
+    return updw
+
+def fixmunicipalitiesattribution():
+    CHANGESETAUTOTAGS[u'comment'] = u"Fixing Municipality and Department Attribution source"
+    replacements = {
+        "6" : "SIMCI-ONUDC, con modificaciones por OCHA",
+        "4" : "SIMCI-ONUDC, con modificaciones por OCHA",
+        }
+    applychanges(
+        conn,
+        client,
+        replacements,
+        "SELECT count(id) FROM ways WHERE tags ?& Array['admin_level','boundary'] AND tags -> 'admin_level' = '{0}' AND tags -> 'source' = 'OCHA - SIGOT'",
+        "SELECT 1,id FROM ways WHERE tags ?& Array['admin_level','boundary'] AND tags -> 'admin_level' = '{0}' AND tags -> 'source' = 'OCHA - SIGOT'",
+        "SELECT kmeans(ARRAY[ST_X(l.p), ST_Y(l.p)], {0}) OVER (), l.id, l.name FROM (SELECT id, tags -> 'name' AS name, ST_PointN(linestring,1) AS p  FROM ways WHERE tags ?& Array['admin_level','boundary'] AND tags -> 'admin_level' = '{1}' AND tags -> 'source' = 'OCHA - SIGOT') AS l ORDER BY kmeans,name;",
+        fixmunicipalityattribution)
+
+#fixmunicipalitiesattribution()
 fixwaynames()
