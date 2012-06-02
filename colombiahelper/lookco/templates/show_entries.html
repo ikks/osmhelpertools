@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+<table class=entries>
+<tr><th>Tipo</th><th>Cantidad</th>
+  {% for entry in entries %}
+    <tr><td>{{ entry.name }}</td><td>{{ entry.cant }}</td></tr>
+  {% else %}
+<!-- Nothing -->
+  {% endfor %}
+  </ul>
+{% endblock %}
