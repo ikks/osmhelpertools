@@ -23,3 +23,4 @@ psql -c "GRANT SELECT on nodes, ways, osm_line, osm_nodes, osm_ways, way_nodes t
 psql -f /usr/share/postgresql/9.1/extension/kmeans.sql $DBNAME
 psql -c "DROP DATABASE "$OLDDB";" template1 && psql -c "ALTER DATABASE "$DBNAME" RENAME TO "$OLDDB";" template1
 rm "$COUNTRY".osm
+psql -c "SELECT *, tags -> 'name' AS name, upper(substr(tags -> 'name',0,(strpos(tags -> 'name',' ')))) AS initial INTO ways_to_fix  FROM ways WHERE tags ?& Array['highway','name'] AND upper(substr(tags -> 'name',0,(strpos(tags -> 'name',' ')+1))) NOT IN ('CALLE ', 'CARRERA ', 'AVENIDA ', 'TRANSVERSAL ', 'DIAGONAL ', 'AUTOPISTA ', 'SALIDA ', 'VÍA ', 'TRONCAL ');CREATE INDEX ON ways_to_fix(id);CREATE INDEX ON ways_to_fix(name);CREATE INDEX ON ways_to_fix(initial);" $DBNAME
