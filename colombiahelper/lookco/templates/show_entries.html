@@ -1,11 +1,16 @@
 {% extends "layout.html" %}
 {% block body %}
-<table class=entries>
+<h1>Arreglos para Colombia</h1>
+<div id="map">
+</div>
+<div id="main_list">
+<table class="entries">
 <tr><th>Tipo</th><th>Cantidad</th>
   {% for entry in entries %}
-    <tr><td>{{ entry.name }}</td><td>{{ entry.cant }}</td></tr>
+    <tr><td><a href="/show/{{ entry.name }}">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
   {% else %}
 <!-- Nothing -->
   {% endfor %}
-  </ul>
+</table>
+</div>
 {% endblock %}

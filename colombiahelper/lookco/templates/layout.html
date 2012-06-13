@@ -1,6 +1,9 @@
 <!doctype html>
+<head>
 <title>Lookco</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 <div class=page>
   <h1>Lookco</h1>
   <div class=metanav>
@@ -15,3 +18,4 @@
   {% endfor %}
   {% block body %}{% endblock %}
 </div>
+</body>
