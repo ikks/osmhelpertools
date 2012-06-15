@@ -40,7 +40,7 @@ def teardown_request(exception):
 
 @app.route('/')
 def show_entries():
-    g.db.execute("SELECT count(*) AS cant,initial AS name FROM ways_to_fix GROUP BY 2 ORDER BY cant DESC,initial")
+    g.db.execute("SELECT count(*) AS cant,initial AS name FROM ways_to_fix GROUP BY 2  HAVING count(*) < 500 ORDER BY cant DESC,initial")
     entries = [{'cant': row[0], 'name': row[1].capitalize() if row[1]!=u'' else u'Varios'} for row in g.db.fetchall()]
     return render_template('show_entries.html', entries=entries)
 

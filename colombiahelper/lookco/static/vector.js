@@ -51,14 +51,13 @@ function init() {
     });
     
     var osm = new OpenLayers.Layer.OSM();            
-    var gmap = new OpenLayers.Layer.Google("Google Streets");
     var styleMap = new OpenLayers.StyleMap({
   'strokeWidth': 5,
   'strokeColor': '#ff0000'
 });
     vectors = new OpenLayers.Layer.Vector("Vector Layer",{styleMap: styleMap});
     
-    var layers = [osm, gmap, vectors];
+    var layers = [osm, vectors];
     map.addLayers(layers);
 
     map.addControl(new OpenLayers.Control.LayerSwitcher());
