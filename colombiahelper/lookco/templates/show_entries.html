@@ -1,16 +1,55 @@
 {% extends "layout.html" %}
 {% block body %}
 <h1>Arreglos para Colombia</h1>
-<div id="map">
+<h2 id="feature_name"></h2>
+<div id="outer" style="width: 850px;position: relative;clear: both;">
+    <div id="map" class="smallmap" style="width:600px; height:500px;float: left;">
+    </div>
+    <div id="main_list" style="width:200px; height:500px; overflow: auto;float: right;">
+    <table class="entries">
+    <tr><th>Tipo</th><th>Características</th>
+      {% for entry in entries %}
+        <tr><td><a onclick="showthing('{{ entry.name }}');">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
+      {% else %}
+    <!-- Nothing -->
+      {% endfor %}
+    </table>
+    </div>
 </div>
-<div id="main_list">
-<table class="entries">
-<tr><th>Tipo</th><th>Cantidad</th>
-  {% for entry in entries %}
-    <tr><td><a href="/show/{{ entry.name }}">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
-  {% else %}
-<!-- Nothing -->
-  {% endfor %}
-</table>
-</div>
+{% endblock %}
+
+{% block js %}
+function showthing(myfilter) {
+    $.get("/show/"+myfilter,function(result){
+        console.log(result);
+        $("#feature_name").html(myfilter);
+        var coder = new OpenLayers.Format.GeoJSON({
+                    'internalProjection': map.baseLayer.projection,
+                    'externalProjection': new OpenLayers.Projection("EPSG:4326")
+                })
+        var features = coder.read(result);
+        var bounds;
+        if(features) {
+            if(features.constructor != Array) {
+                features = [features];
+            }
+            for(var i=0; i<features.length; ++i) {
+                if (!bounds) {
+                    bounds = features[i].geometry.getBounds();
+                } else {
+                    bounds.extend(features[i].geometry.getBounds());
+                }
+
+            }
+            vectors.removeAllFeatures();
+            vectors.addFeatures(features);
+            map.zoomToExtent(bounds);
+            var plural = (features.length > 1) ? 's' : '';
+            console.log(features.length + ' feature' + plural + ' added');
+        } else {
+            console.log('Bad input ' + type);
+        }
+    });
+    return false;
+}
 {% endblock %}

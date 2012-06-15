@@ -2,11 +2,16 @@
 # -*- coding: utf-8 -*-
 import psycopg2
 import psycopg2.extensions
+import logging
+import simplejson
+
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, jsonify
 
 from vectorformats.Feature import Feature
 from vectorformats.Formats import GeoJSON
+
+logging.basicConfig(filename='/tmp/map.log',level=logging.INFO)
 
 # configuration
 #DATABASE = 'postgresql://osm:osm@localhost/osm'
@@ -41,11 +46,12 @@ def show_entries():
 
 @app.route('/show/<initial>')
 def show_details(initial):
-    q = "SELECT id,name,st_asgeojson(linestring) FROM ways_to_fix WHERE initial='{0}'".format(initial.upper())
-    g.db.execute(q)
-    details = [Feature(f[0],f[2],{'name' : f[1]}) for f in g.db.fetchall()]
-    geoj = GeoJSON.GeoJSON()    
-    return jsonify(result=geoj.encode(details).replace("\\",""))
+    q = "SELECT id,name,st_asgeojson(linestring) FROM ways_to_fix WHERE initial = %s"
+    g.db.execute(q,(initial.upper(),))
+    details = [Feature(f[0],simplejson.loads(f[2]),{'name' : f[1]}) for f in g.db.fetchall()]
+    geoj = GeoJSON.GeoJSON()
+    #logging.info(jsonify(result=geoj.encode(details)))
+    return geoj.encode(details)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
