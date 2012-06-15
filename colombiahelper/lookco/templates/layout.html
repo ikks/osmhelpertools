@@ -15,7 +15,7 @@
   <h1>Lookco</h1>
   <div class=metanav>
   {% if not session.logged_in %}
-    <a href="{{ url_for('login') }}">log in</a>
+    <a href="{{ url_for('login') }}" style="display:none;">log in</a>
   {% else %}
     <a href="{{ url_for('logout') }}">log out</a>
   {% endif %}
