@@ -38,6 +38,18 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
 
 });
 
+String.prototype.format = function() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+};
+
+function showInfo(feature) {
+    $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format(feature.data.name,feature.data.middle.coordinates[1],feature.data.middle.coordinates[0]));
+}
 
 function init() {
     map = new OpenLayers.Map({
@@ -52,11 +64,19 @@ function init() {
     
     var osm = new OpenLayers.Layer.OSM();            
     var styleMap = new OpenLayers.StyleMap({
-  'strokeWidth': 5,
-  'strokeColor': '#ff0000'
-});
-    vectors = new OpenLayers.Layer.Vector("Vector Layer",{styleMap: styleMap});
+      'strokeWidth': 5,
+      'strokeColor': '#ff0000'
+    });
+    vectors = new OpenLayers.Layer.Vector("Vías Nombres raros",{styleMap: styleMap});
     
+    var options = {
+        hover: true,
+        onSelect: showInfo,
+    };
+    var select = new OpenLayers.Control.SelectFeature(vectors, options);
+    map.addControl(select);
+    select.activate();
+
     var layers = [osm, vectors];
     map.addLayers(layers);
 
@@ -71,7 +91,7 @@ function init() {
     );
     map.addControl(new OpenLayers.Control.MousePosition({displayProjection 
 							 :new OpenLayers.Projection("EPSG:4326")
-}));
+    }));
     var click = new OpenLayers.Control.Click();
     map.addControl(click);
     click.activate();

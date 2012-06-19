@@ -1,7 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
+<div id="title_info">
 <h1>Arreglos para Colombia</h1>
 <h2 id="feature_name"></h2>
+<span id="info_detail"></span>
+</div>
 <div id="outer" style="width: 850px;position: relative;clear: both;">
     <div id="map" class="smallmap" style="width:600px; height:500px;float: left;">
     </div>
@@ -9,7 +12,7 @@
     <table class="entries">
     <tr><th>Tipo</th><th>Características</th>
       {% for entry in entries %}
-        <tr><td><a onclick="showthing('{{ entry.name }}');">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
+        <tr><td><a onclick="showthing('{{ entry.name }}');" target="_blank">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
       {% else %}
     <!-- Nothing -->
       {% endfor %}
@@ -21,7 +24,6 @@
 {% block js %}
 function showthing(myfilter) {
     $.get("/show/"+myfilter,function(result){
-        console.log(result);
         $("#feature_name").html(myfilter);
         var coder = new OpenLayers.Format.GeoJSON({
                     'internalProjection': map.baseLayer.projection,
@@ -45,9 +47,8 @@ function showthing(myfilter) {
             vectors.addFeatures(features);
             map.zoomToExtent(bounds);
             var plural = (features.length > 1) ? 's' : '';
-            console.log(features.length + ' feature' + plural + ' added');
         } else {
-            console.log('Bad input ' + type);
+            console.log('Server error ' + type);
         }
     });
     return false;

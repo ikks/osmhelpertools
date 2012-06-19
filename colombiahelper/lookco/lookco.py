@@ -38,6 +38,7 @@ def before_request():
 def teardown_request(exception):
     g.db.close()
 
+
 @app.route('/')
 def show_entries():
     g.db.execute("SELECT count(*) AS cant,initial AS name FROM ways_to_fix GROUP BY 2  HAVING count(*) < 500 ORDER BY cant DESC,initial")
@@ -46,11 +47,10 @@ def show_entries():
 
 @app.route('/show/<initial>')
 def show_details(initial):
-    q = "SELECT id,name,st_asgeojson(linestring) FROM ways_to_fix WHERE initial = %s"
+    q = "SELECT id,name,st_asgeojson(linestring),st_asgeojson(ST_PointN(linestring,ST_NumPoints(linestring)/2)) AS middle FROM ways_to_fix WHERE initial = %s"
     g.db.execute(q,(initial.upper(),))
-    details = [Feature(f[0],simplejson.loads(f[2]),{'name' : f[1]}) for f in g.db.fetchall()]
+    details = [Feature(f[0],simplejson.loads(f[2]),{'name': f[1], 'middle': simplejson.loads(f[3])}) for f in g.db.fetchall()]
     geoj = GeoJSON.GeoJSON()
-    #logging.info(jsonify(result=geoj.encode(details)))
     return geoj.encode(details)
 
 @app.route('/login', methods=['GET', 'POST'])
