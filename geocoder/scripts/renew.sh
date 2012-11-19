@@ -8,7 +8,7 @@ echo "YOU MUST configure localinfo.sh, grab a sample from localinfo.sh.sample"
 exit 0;
 fi;
 
-wget "http://download.geofabrik.de/osm/south-america/"$COUNTRY".osm.bz2"
+wget "http://download.geofabrik.de/openstreetmap/south-america/"$COUNTRY".osm.bz2"
 time bunzip2 $COUNTRY".osm.bz2"
 dropdb $DBNAME
 createdb -O $DBUSER -T template_postgis $DBNAME
