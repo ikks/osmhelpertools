@@ -2,43 +2,6 @@ var map;
 var waystofix;
 var hireslayer;
 
-OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {               
-    defaultHandlerOptions: {
-        'single': true,
-        'double': false,
-        'pixelTolerance': 0,
-        'stopSingle': false,
-        'stopDouble': false
-    },
-
-    initialize: function(options) {
-        this.handlerOptions = OpenLayers.Util.extend(
-            {}, this.defaultHandlerOptions
-        );
-        OpenLayers.Control.prototype.initialize.apply(
-            this, arguments
-        ); 
-        this.handler = new OpenLayers.Handler.Click(
-            this, {
-                'click': this.trigger
-            }, this.handlerOptions
-        );
-    }, 
-
-    trigger: function(e) {
-        var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(
-            map.getProjectionObject(),                    new OpenLayers.Projection("EPSG:4326"));
-	$.get("http://test.openstreetmap.co/geoc/osb.php?ll="+lonlat.lat.toFixed(5)+","+lonlat.lon.toFixed(5)+"&format=json", function(response){
-	    json = eval("(" + response + ')');
-	    var diraprox = "";
-	    if (json.text !== undefined && json.error === undefined)
-		diraprox = " "+json.text;
-	    document.getElementById("thearea").value+=lonlat.lat.toFixed(5)+","+lonlat.lon.toFixed(5)+diraprox+"\n";
-	});
-    }
-
-});
-
 String.prototype.format = function() {
     var formatted = this;
     for (var i = 0; i < arguments.length; i++) {
@@ -99,10 +62,6 @@ function init() {
     map.addControl(new OpenLayers.Control.MousePosition({displayProjection 
 							 :new OpenLayers.Projection("EPSG:4326")
     }));
-    var click = new OpenLayers.Control.Click();
-    map.addControl(click);
-    click.activate();
-
 
     $("#goto").click(function() {
 	map.moveTo(
