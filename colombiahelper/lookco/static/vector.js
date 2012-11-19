@@ -1,5 +1,6 @@
 var map;
-var vectors;
+var waystofix;
+var hireslayer;
 
 OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {               
     defaultHandlerOptions: {
@@ -65,19 +66,25 @@ function init() {
     var osm = new OpenLayers.Layer.OSM();            
     var styleMap = new OpenLayers.StyleMap({
       'strokeWidth': 5,
-      'strokeColor': '#ff0000'
+      'strokeColor': '#FF0000'
     });
-    vectors = new OpenLayers.Layer.Vector("Vías Nombres raros",{styleMap: styleMap});
+    var styleMaphires = new OpenLayers.StyleMap({
+      'strokeWidth': 2,
+      'strokeColor': '#00AA00',
+      'fillColor': '#AAFFAA',
+    });
+    waystofix = new OpenLayers.Layer.Vector("Vías Nombres raros",{styleMap: styleMap});
+    hireslayer = new OpenLayers.Layer.Vector("Aerofotografía para calcar",{styleMap: styleMaphires});
     
     var options = {
         hover: true,
         onSelect: showInfo,
     };
-    var select = new OpenLayers.Control.SelectFeature(vectors, options);
+    var select = new OpenLayers.Control.SelectFeature(waystofix, options);
     map.addControl(select);
     select.activate();
 
-    var layers = [osm, vectors];
+    var layers = [osm, waystofix, hireslayer];
     map.addLayers(layers);
 
     map.addControl(new OpenLayers.Control.LayerSwitcher());
@@ -104,4 +111,29 @@ function init() {
             map.getProjectionObject()
         ),3);
     });
+    $.get("/hires/",function(result){
+        var coder = new OpenLayers.Format.GeoJSON({
+            'internalProjection': map.baseLayer.projection,
+            'externalProjection': new OpenLayers.Projection("EPSG:4326")
+        })
+        var features = coder.read(result);
+        var bounds;
+        if(features) {
+            if(features.constructor != Array) {
+                features = [features];
+            }
+            for(var i=0; i<features.length; ++i) {
+                if (!bounds) {
+                    bounds = features[i].geometry.getBounds();
+                } else {
+                    bounds.extend(features[i].geometry.getBounds());
+                }
+
+            }
+            hireslayer.addFeatures(features);
+        } 
+        else {
+            console.log('Server error ' + type);
+        }
+    })
 }

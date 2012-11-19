@@ -12,10 +12,16 @@
     <table class="entries">
     <tr><th>Tipo</th><th>Características</th>
       {% for entry in entries %}
-        <tr><td><a onclick="showthing('{{ entry.name }}');" target="_blank">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
+        <tr><td><a onclick="showthing('{{ entry.name }}');" style="cursor:pointer;">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
       {% else %}
     <!-- Nothing -->
       {% endfor %}
+    </table>
+    <table class="entries">
+        <tr><th>Atributos</th></tr>
+        {% for poly in hires %}
+        <tr><td data-hiresid="{{ poly.id }}">{{ poly.desc }}</td></tr>
+        {% endfor %}
     </table>
     </div>
 </div>
@@ -26,9 +32,9 @@ function showthing(myfilter) {
     $.get("/show/"+myfilter,function(result){
         $("#feature_name").html(myfilter);
         var coder = new OpenLayers.Format.GeoJSON({
-                    'internalProjection': map.baseLayer.projection,
-                    'externalProjection': new OpenLayers.Projection("EPSG:4326")
-                })
+            'internalProjection': map.baseLayer.projection,
+            'externalProjection': new OpenLayers.Projection("EPSG:4326")
+        })
         var features = coder.read(result);
         var bounds;
         if(features) {
@@ -43,8 +49,8 @@ function showthing(myfilter) {
                 }
 
             }
-            vectors.removeAllFeatures();
-            vectors.addFeatures(features);
+            waystofix.removeAllFeatures();
+            waystofix.addFeatures(features);
             map.zoomToExtent(bounds);
             var plural = (features.length > 1) ? 's' : '';
         } else {
