@@ -2,14 +2,31 @@
 {% block body %}
 <div id="title_info">
 <h1>Arreglos para Colombia</h1>
+<select>
+    <option value="hires">Aerofotografía para calcar</option>
+    <option value="waystofix">Vías para arreglar</option>
+</select>
+<div>
+    <div id="help_hires">
+        <p>Estas son las zonas que tienen aerofotografía de alta resolución, tales zonas son
+            susceptibles de ser mejoradas calcando ríos, ojos de agua, carreteras, e incluso
+            casas.
+    </div>
+    <div id="help_waystofix" style="display:none;">
+        <p>Hay vías que no tienen nombres adecuados, elija aquellas que desea arreglar en el
+            panel derecho y cuando se proyecten en color rojo, puede pasar el mouse por encima
+            de las mismas, hay opción para visualizar en osm, editar con josm o potlatch.
+    </div>
+</div>
 <h2 id="feature_name"></h2>
 <span id="info_detail"></span>
+<p id="goto" style="cursor:pointer;">Ver Colombia</p>
 </div>
 <div id="outer" style="width: 850px;position: relative;clear: both;">
     <div id="map" class="smallmap" style="width:600px; height:500px;float: left;">
     </div>
     <div id="main_list" style="width:200px; height:500px; overflow: auto;float: right;">
-    <table class="entries">
+    <table class="entries" id="waystofix" style="display:none;">
     <tr><th>Tipo</th><th>Características</th>
       {% for entry in entries %}
         <tr><td><a onclick="showthing('{{ entry.name }}');" style="cursor:pointer;">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
@@ -17,10 +34,9 @@
     <!-- Nothing -->
       {% endfor %}
     </table>
-    <table class="entries">
-        <tr><th>Atributos</th></tr>
+    <table class="entries" id="hires">
         {% for poly in hires %}
-        <tr><td data-hiresid="{{ poly.id }}">{{ poly.desc }}</td></tr>
+        <tr><td data-hiresid="{{ poly.id }}" class="hiresitem" style="cursor:pointer;">{{ poly.desc }}</td></tr>
         {% endfor %}
     </table>
     </div>
@@ -59,4 +75,37 @@ function showthing(myfilter) {
     });
     return false;
 }
+$(function(){
+    $("select").change(function(){
+        switch($("select option:selected").val()){
+            case "hires":
+                waystofix.setVisibility(false);
+                hireslayer.setVisibility(true);
+                $("#waystofix").hide();
+                $("#hires").show();
+                $("#help_hires").show();
+                $("#help_waystofix").hide();
+                break;
+            case "waystofix":
+                waystofix.setVisibility(true);
+                hireslayer.setVisibility(false);
+                $("#waystofix").show();
+                $("#hires").hide();
+                $("#help_hires").hide();
+                $("#help_waystofix").show();
+                break;
+        }
+    });
+});
+$(".hiresitem").click(function(){
+    console.log($(this).data("hiresid"));
+    for (var i=0; i < hireslayer.features.length; i++){
+        console.log(hireslayer.features[i].fid);
+        if (hireslayer.features[i].fid === $(this).data('hiresid')){
+            console.log("found");
+            map.zoomToExtent(hireslayer.features[i].geometry.getBounds());
+            return;
+        }
+    }
+});
 {% endblock %}

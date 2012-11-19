@@ -32,7 +32,6 @@ SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
 
-# create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
@@ -57,8 +56,8 @@ def teardown_request(exception):
 def show_entries():
     g.db.execute("SELECT count(*) AS cant,initial AS name FROM ways_to_fix GROUP BY 2  HAVING count(*) < 500 ORDER BY cant DESC,initial")
     entries = [{'cant': row[0], 'name': row[1].capitalize() if row[1] != u'' else u'Varios'} for row in g.db.fetchall()]
-    g.db.execute("SELECT id, tags, st_asgeojson(linestring) FROM ways WHERE tags ? 'hires';")
-    hires = [{'id': row[0], 'desc': 'mofo'} for row in g.db.fetchall()]
+    g.db.execute("SELECT id, COALESCE(tags -> 'name', tags -> 'note', tags -> 'description', tags -> 'source', '') AS name, st_asgeojson(linestring) FROM ways WHERE tags ? 'hires' ORDER BY 2;")
+    hires = [{'id': row[0], 'desc': row[1]} for row in g.db.fetchall()]
     return render_template('show_entries.html', entries=entries, hires=hires)
 
 
@@ -73,7 +72,7 @@ def show_details(initial):
 
 @app.route('/hires/')
 def hires():
-    q = "SELECT id, tags, st_asgeojson(linestring) FROM ways WHERE tags ? 'hires';"
+    q = "SELECT id, COALESCE(tags -> 'name', tags -> 'note', tags -> 'description', tags -> 'source'), st_asgeojson(linestring) FROM ways WHERE tags ? 'hires' ORDER BY id;"
     g.db.execute(q)
     details = [Feature(f[0], simplejson.loads(f[2]), {'data': f[1]}) for f in g.db.fetchall()]
     geoj = GeoJSON.GeoJSON()

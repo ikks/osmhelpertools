@@ -26,17 +26,19 @@ function init() {
         )
     });
     
-    var osm = new OpenLayers.Layer.OSM();            
+    var osm = new OpenLayers.Layer.OSM();
+
     var styleMap = new OpenLayers.StyleMap({
       'strokeWidth': 5,
       'strokeColor': '#FF0000'
     });
+    waystofix = new OpenLayers.Layer.Vector("Vías Nombres raros",{styleMap: styleMap});
+    
     var styleMaphires = new OpenLayers.StyleMap({
       'strokeWidth': 2,
       'strokeColor': '#00AA00',
       'fillColor': '#AAFFAA',
     });
-    waystofix = new OpenLayers.Layer.Vector("Vías Nombres raros",{styleMap: styleMap});
     hireslayer = new OpenLayers.Layer.Vector("Aerofotografía para calcar",{styleMap: styleMaphires});
     
     var options = {
@@ -50,25 +52,25 @@ function init() {
     var layers = [osm, waystofix, hireslayer];
     map.addLayers(layers);
 
-    map.addControl(new OpenLayers.Control.LayerSwitcher());
+    // map.addControl(new OpenLayers.Control.LayerSwitcher());
 
     map.setCenter(
         new OpenLayers.LonLat(-74.11128,4.61799).transform(
             new OpenLayers.Projection("EPSG:4326"),
             map.getProjectionObject()
         ), 
-        11
+        5
     );
     map.addControl(new OpenLayers.Control.MousePosition({displayProjection 
-							 :new OpenLayers.Projection("EPSG:4326")
+         :new OpenLayers.Projection("EPSG:4326")
     }));
 
     $("#goto").click(function() {
-	map.moveTo(
-            new OpenLayers.LonLat(-70.00098,-0.91673).transform(
+    map.moveTo(
+        new OpenLayers.LonLat(-74.11128,4.61799).transform(
             new OpenLayers.Projection("EPSG:4326"),
             map.getProjectionObject()
-        ),3);
+        ), 5)
     });
     $.get("/hires/",function(result){
         var coder = new OpenLayers.Format.GeoJSON({
@@ -94,5 +96,6 @@ function init() {
         else {
             console.log('Server error ' + type);
         }
-    })
+    });
+    waystofix.setVisibility(false);
 }
