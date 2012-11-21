@@ -15,6 +15,12 @@ function showInfo(feature) {
     $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format(feature.data.name,feature.data.middle.coordinates[1],feature.data.middle.coordinates[0]));
 }
 
+function colorize(feature){
+    $(".hiresitem p").css("background-color","");
+    $("td[data-hiresid='" + feature.fid + "'] p").css("background-color","#CCFFCC");
+}
+
+
 function init() {
     map = new OpenLayers.Map({
         div: "map",
@@ -43,11 +49,20 @@ function init() {
     
     var options = {
         hover: true,
-        onSelect: showInfo,
+        onSelect: showInfo
     };
     var select = new OpenLayers.Control.SelectFeature(waystofix, options);
     map.addControl(select);
     select.activate();
+
+    var other = {
+        hover: true,
+        onSelect: colorize,
+    };
+
+    var colorthis = new OpenLayers.Control.SelectFeature(hireslayer, other);
+    map.addControl(colorthis);
+    colorthis.activate();
 
     var layers = [osm, waystofix, hireslayer];
     map.addLayers(layers);
