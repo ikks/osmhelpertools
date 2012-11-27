@@ -36,7 +36,7 @@
     </table>
     <table class="entries" id="hires">
         {% for poly in hires %}
-        <tr><td data-hiresid="{{ poly.id }}" class="hiresitem" style="cursor:pointer;"><p>{{ poly.desc }}</td></tr>
+        <tr><td data-hiresid="{{ poly.id }}" title="{{ poly.id }}" class="hiresitem" style="cursor:pointer;"><p>{{ poly.desc }}</td></tr>
         {% endfor %}
     </table>
     </div>
