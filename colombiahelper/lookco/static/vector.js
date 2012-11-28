@@ -47,6 +47,9 @@ function init() {
     });
     hireslayer = new OpenLayers.Layer.Vector("Aerofotografía para calcar",{styleMap: styleMaphires});
     
+    var strategy = new OpenLayers.Strategy.Cluster({distance: 15, threshold: 3});
+    manynameslayer = new OpenLayers.Layer.Vector("Intersecciones con varios nombres", {strategies: [strategy]});
+
     var options = {
         hover: true,
         onSelect: showInfo
@@ -64,8 +67,11 @@ function init() {
     map.addControl(colorthis);
     colorthis.activate();
 
-    var layers = [osm, waystofix, hireslayer];
+    var layers = [osm, waystofix, hireslayer, manynameslayer];
     map.addLayers(layers);
+    manynameslayer.setVisibility(false);
+    waystofix.setVisibility(false);
+    hireslayer.setVisibility(true);
 
     // map.addControl(new OpenLayers.Control.LayerSwitcher());
 
@@ -81,11 +87,12 @@ function init() {
     }));
 
     $("#goto").click(function() {
-    map.moveTo(
-        new OpenLayers.LonLat(-74.11128,4.61799).transform(
-            new OpenLayers.Projection("EPSG:4326"),
-            map.getProjectionObject()
-        ), 5)
+        map.moveTo(
+            new OpenLayers.LonLat(-74.11128,4.61799).transform(
+                new OpenLayers.Projection("EPSG:4326"),
+                map.getProjectionObject()
+            ), 5
+        );
     });
     $.get("/hires/",function(result){
         var coder = new OpenLayers.Format.GeoJSON({
@@ -109,7 +116,33 @@ function init() {
             hireslayer.addFeatures(features);
         } 
         else {
-            console.log('Server error ' + type);
+            console.log('Server error for hires ' + type);
+        }
+    });
+
+    $.get("/intersections/", function(result){
+        var coder = new OpenLayers.Format.GeoJSON({
+            'internalProjection': map.baseLayer.projection,
+            'externalProjection': new OpenLayers.Projection("EPSG:4326")
+        })
+        var features = coder.read(result);
+        var bounds;
+        if(features) {
+            if(features.constructor != Array) {
+                features = [features];
+            }
+            for(var i=0; i<features.length; ++i) {
+                if (!bounds) {
+                    bounds = features[i].geometry.getBounds();
+                } else {
+                    bounds.extend(features[i].geometry.getBounds());
+                }
+
+            }
+            manynameslayer.addFeatures(features);
+        } 
+        else {
+            console.log('Server error for intersections' + type);
         }
     });
     waystofix.setVisibility(false);

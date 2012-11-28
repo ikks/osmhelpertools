@@ -58,7 +58,14 @@ def show_entries():
     entries = [{'cant': row[0], 'name': row[1].capitalize() if row[1] != u'' else u'Varios'} for row in g.db.fetchall()]
     g.db.execute("SELECT id, COALESCE(tags -> 'name', tags -> 'note', tags -> 'description', tags -> 'source', '') AS name, st_asgeojson(linestring) FROM ways WHERE tags ? 'hires' ORDER BY 2;")
     hires = [{'id': row[0], 'desc': row[1]} for row in g.db.fetchall()]
-    return render_template('show_entries.html', entries=entries, hires=hires)
+    g.db.execute("SELECT id, count, x(geom), y(geom), names FROM inter_to_fix;")
+    intersections = [{'id': row[0], 'desc': row[4], 'lat':row[3], 'lon':row[2]} for row in g.db.fetchall()]
+    return render_template(
+        'show_entries.html',
+        entries=entries,
+        hires=hires,
+        intersections=intersections
+    )
 
 
 @app.route('/show/<initial>')
@@ -75,6 +82,15 @@ def hires():
     q = "SELECT id, COALESCE(tags -> 'name', tags -> 'note', tags -> 'description', tags -> 'source'), st_asgeojson(linestring) FROM ways WHERE tags ? 'hires' ORDER BY id;"
     g.db.execute(q)
     details = [Feature(f[0], simplejson.loads(f[2]), {'data': f[1]}) for f in g.db.fetchall()]
+    geoj = GeoJSON.GeoJSON()
+    return geoj.encode(details)
+
+
+@app.route('/intersections/')
+def intersections():
+    q = "SELECT id, count, st_asgeojson(geom) FROM inter_to_fix"
+    g.db.execute(q)
+    details = [Feature(f[0], simplejson.loads(f[2]), {'cant': f[1]}) for f in g.db.fetchall()]
     geoj = GeoJSON.GeoJSON()
     return geoj.encode(details)
 

@@ -5,6 +5,7 @@
 <select>
     <option value="hires">Aerofotografía para calcar</option>
     <option value="waystofix">Vías para arreglar</option>
+    <option value="manynames">Intersección multinombrada</option>
 </select>
 <div>
     <div id="help_hires">
@@ -16,6 +17,9 @@
         <p>Hay vías que no tienen nombres adecuados, elija aquellas que desea arreglar en el
             panel derecho y cuando se proyecten en color rojo, puede pasar el mouse por encima
             de las mismas, hay opción para visualizar en osm, editar con josm o potlatch.
+    </div>
+    <div id="help_manynames" style="display:none;">
+        <p>Hay intersecciones que lucen sospechosas, puesto que hay varias vías que llegan a ellas con nombres distintos, puede ser que algunas sean erróneas y requieran ser arregladas.  Esto servirá para poder contar con un geocoder bueno para el país.
     </div>
 </div>
 <h2 id="feature_name"></h2>
@@ -37,6 +41,11 @@
     <table class="entries" id="hires">
         {% for poly in hires %}
         <tr><td data-hiresid="{{ poly.id }}" title="{{ poly.id }}" class="hiresitem" style="cursor:pointer;"><p>{{ poly.desc }}</td></tr>
+        {% endfor %}
+    </table>
+    <table class="entries" id="manynames">
+        {% for inter in intersections %}
+        <tr><td data-lat="{{ inter.lat }}" data-lon="{{ inter.lon }}" title="{{ inter.id }}" class="intersection" style="cursor:pointer;"><p>{{ inter.desc }}</td></tr>
         {% endfor %}
     </table>
     </div>
@@ -70,7 +79,7 @@ function showthing(myfilter) {
             map.zoomToExtent(bounds);
             var plural = (features.length > 1) ? 's' : '';
         } else {
-            console.log('Server error ' + type);
+            console.log('Server error getting names with suspicious name' + type);
         }
     });
     return false;
@@ -79,33 +88,58 @@ $(function(){
     $("select").change(function(){
         switch($("select option:selected").val()){
             case "hires":
+                manynameslayer.setVisibility(false);
                 waystofix.setVisibility(false);
                 hireslayer.setVisibility(true);
                 $("#waystofix").hide();
                 $("#hires").show();
                 $("#help_hires").show();
                 $("#help_waystofix").hide();
+                $("#manynames").hide();
+                $("#help_manynames").hide();
+                $("#goto").click();
                 break;
             case "waystofix":
                 waystofix.setVisibility(true);
                 hireslayer.setVisibility(false);
+                manynameslayer.setVisibility(false);
                 $("#waystofix").show();
                 $("#hires").hide();
                 $("#help_hires").hide();
                 $("#help_waystofix").show();
+                $("#manynames").hide();
+                $("#help_manynames").hide();
+                break;
+            case "manynames":
+                waystofix.setVisibility(false);
+                hireslayer.setVisibility(false);
+                manynameslayer.setVisibility(true);
+                $("#waystofix").hide();
+                $("#help_waystofix").hide();
+                $("#hires").hide();
+                $("#help_hires").hide();
+                $("#manynames").show();
+                $("#help_manynames").show();
                 break;
         }
     });
 });
 $(".hiresitem").click(function(){
-    console.log($(this).data("hiresid"));
     for (var i=0; i < hireslayer.features.length; i++){
-        console.log(hireslayer.features[i].fid);
         if (hireslayer.features[i].fid === $(this).data('hiresid')){
-            console.log("found");
             map.zoomToExtent(hireslayer.features[i].geometry.getBounds());
             return;
         }
     }
+    return false;
+});
+$(".intersection").click(function(){
+    map.moveTo(
+        new OpenLayers.LonLat($(this).data('lon'), $(this).data('lat')).transform(
+            new OpenLayers.Projection("EPSG:4326"),
+            map.getProjectionObject()
+        ), 18
+    );
+    $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format($(this).find("p").html(),$(this).data('lat'),$(this).data('lon')));
 });
 {% endblock %}
