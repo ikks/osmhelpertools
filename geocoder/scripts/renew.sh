@@ -27,3 +27,5 @@ psql -c "SELECT n2.id AS id, s1.count AS cant, y(n2.geom)||','||x(n2.geom) AS la
 psql -c "GRANT SELECT ON ways_to_fix, inter_to_fix, intersections TO $DBUSER;" $DBNAME
 psql -c "DROP DATABASE "$OLDDB";" template1 && psql -c "ALTER DATABASE "$DBNAME" RENAME TO "$OLDDB";" template1
 rm "$COUNTRY".osm
+redis-cli flushdb
+python load_data.py
