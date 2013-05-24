@@ -50,6 +50,24 @@
     </table>
     </div>
 </div>
+<div>
+    <div  id="id_geocode_div" style="display:none;">
+        <form>
+            <textarea id="id_sourcedirs" cols="30" rows="25">Carrera 57#66B
+Calle 150A#101
+Calle 70C#56B
+Carrera 10#86
+Calle 7B#20A
+Carrera 7B#26 Sur
+Calle 26 S#3E
+Carrera 45A#34 Sur</textarea>
+            <button id="id_geocode">-></button>
+            <textarea id="id_result" cols="55" rows="25">
+            </textarea>
+        <form>
+    </div>
+    <span id="toggle_geocoder">Geocoder</span>
+</div>
 {% endblock %}
 
 {% block js %}
@@ -141,5 +159,23 @@ $(".intersection").click(function(){
         ), 18
     );
     $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format($(this).find("p").html(),$(this).data('lat'),$(this).data('lon')));
+});
+$('#id_geocode').click(function(){
+    var button = $('#id_geocode');
+    $.post('/geocoder', { dirs:$('#id_sourcedirs').val()},
+        function(result){
+            var show = ""
+            var res = result.answer;
+            for(i=0;i < res.length; i++){
+                show += res[i].incoming + ' -> ' + res[i].latlon + '\n';
+            }
+            $('#id_result').val(show);
+            button.html(result.incoming + ' -> ' + result.resolved)
+        }
+    );
+   return false;
+});
+$('#toggle_geocoder').click(function(){
+    $('#id_geocode_div').slideToggle();
 });
 {% endblock %}

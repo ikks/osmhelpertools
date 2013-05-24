@@ -4,6 +4,7 @@ import psycopg2
 import psycopg2.extensions
 import logging
 import simplejson
+import redis
 
 from flask import Flask
 from flask import request
@@ -13,6 +14,7 @@ from flask import redirect
 from flask import url_for
 from flask import render_template
 from flask import flash
+from flask import Response
 
 from vectorformats.Feature import Feature
 from vectorformats.Formats import GeoJSON
@@ -35,6 +37,7 @@ PASSWORD = 'default'
 app = Flask(__name__)
 app.config.from_object(__name__)
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+r_server = redis.Redis("localhost")
 
 
 def connect_db():
@@ -65,6 +68,38 @@ def show_entries():
         entries=entries,
         hires=hires,
         intersections=intersections
+    )
+
+
+@app.route('/geocoder', methods=['POST'])
+def geocoder():
+    incoming_dirs = request.form.get('dirs')
+    if incoming_dirs is None:
+        return ''
+    lines = incoming_dirs.split('\n')
+    answer = []
+    resolved = 0
+    count = 0
+    for line in lines:
+        parsed = line.split('#')
+        if len(parsed) != 2:
+            continue
+        count += 1
+        result = {
+            'incoming': line,
+            'latlon': r_server.hget(*[segment.strip() for segment in parsed]),
+        }
+        if result['latlon'] is not None:
+            resolved += 1
+        answer.append(result)
+    return Response(
+        response=simplejson.dumps({
+            'answer': answer,
+            'incoming': count,
+            'resolved': resolved,
+        }),
+        status=200,
+        mimetype="application/json"
     )
 
 
@@ -118,4 +153,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
-
