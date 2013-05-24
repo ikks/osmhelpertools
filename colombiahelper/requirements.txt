@@ -2,6 +2,6 @@ Flask==0.8
 Flask-SQLAlchemy==0.16
 psycopg2==2.4.5
 vectorformats==0.1
-simplejson==2.5.2
 hiredis==0.1.1
 redis==2.7.2
+simplejson==3.3.0
