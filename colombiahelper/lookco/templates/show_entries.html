@@ -162,7 +162,7 @@ $(".intersection").click(function(){
 });
 $('#id_geocode').click(function(){
     var button = $('#id_geocode');
-    $.post('/geocoder', { dirs:$('#id_sourcedirs').val()},
+    $.post('/geocoder', { dirs:$('#id_sourcedirs').val().toUpperCase()},
         function(result){
             var show = ""
             var res = result.answer;
