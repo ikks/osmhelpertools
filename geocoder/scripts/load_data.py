@@ -3,6 +3,10 @@ import redis
 
 
 def fillredis():
+    """Fills a redis instance with hash of the form:
+    'CARRERA 20' '40' 'lat,lon[|lat,lon]*'
+    From the table intersections of the form name[|name] and lat,lon
+    """
     thedict = {
         'Calle ': 1,
         'Carrera ': 1,
@@ -16,6 +20,7 @@ def fillredis():
     )
     cursor = conn.cursor()
     cursor.execute("SELECT names,latlon FROM intersections")
+    thing = {}
     for row in cursor.fetchall():
         names = row[0].split(',')
         for i in range(len(names)):
@@ -31,9 +36,20 @@ def fillredis():
                                 part = jth[1][jth[1].find(' ') + 1:]
                         except:
                             pass
-                        pipe.hset(ith[1], part, row[1])
+                        key = ith[1].upper()
+                        key2 = part.upper()
+                        value = row[1].upper()
+                        if key not in thing:
+                            thing[key] = {key2: value}
+                        elif key2 not in thing[key]:
+                            thing[key][key2] = value
+                        elif thing[key][key2].find(value) == -1:
+                            thing[key][key2] += "|" + value
                     except:
                         pass
+    for keys in thing:
+        for key in thing[keys]:
+            pipe.hset(keys, key, thing[keys][key])
     pipe.execute()
 
 fillredis()
