@@ -3,7 +3,8 @@
 import psycopg2
 import psycopg2.extensions
 import logging
-import simplejson
+from json import loads
+from json import dumps
 import redis
 
 from flask import Flask
@@ -93,7 +94,7 @@ def geocoder():
             resolved += 1
         answer.append(result)
     return Response(
-        response=simplejson.dumps({
+        response=dumps({
             'answer': answer,
             'incoming': count,
             'resolved': resolved,
@@ -107,7 +108,7 @@ def geocoder():
 def show_details(initial):
     q = "SELECT id,name,st_asgeojson(linestring),st_asgeojson(ST_PointN(linestring,ST_NumPoints(linestring)/2)) AS middle FROM ways_to_fix WHERE initial = %s"
     g.db.execute(q, (initial.upper(),))
-    details = [Feature(f[0], simplejson.loads(f[2]), {'name': f[1], 'middle': simplejson.loads(f[3])}) for f in g.db.fetchall()]
+    details = [Feature(f[0], loads(f[2]), {'name': f[1], 'middle': loads(f[3])}) for f in g.db.fetchall()]
     geoj = GeoJSON.GeoJSON()
     return geoj.encode(details)
 
@@ -116,7 +117,7 @@ def show_details(initial):
 def hires():
     q = "SELECT id, COALESCE(tags -> 'name', tags -> 'note', tags -> 'description', tags -> 'source'), st_asgeojson(linestring) FROM ways WHERE tags ? 'hires' ORDER BY id;"
     g.db.execute(q)
-    details = [Feature(f[0], simplejson.loads(f[2]), {'data': f[1]}) for f in g.db.fetchall()]
+    details = [Feature(f[0], loads(f[2]), {'data': f[1]}) for f in g.db.fetchall()]
     geoj = GeoJSON.GeoJSON()
     return geoj.encode(details)
 
@@ -125,7 +126,7 @@ def hires():
 def intersections():
     q = "SELECT id, count, st_asgeojson(geom) FROM inter_to_fix"
     g.db.execute(q)
-    details = [Feature(f[0], simplejson.loads(f[2]), {'cant': f[1]}) for f in g.db.fetchall()]
+    details = [Feature(f[0], loads(f[2]), {'cant': f[1]}) for f in g.db.fetchall()]
     geoj = GeoJSON.GeoJSON()
     return geoj.encode(details)
 
