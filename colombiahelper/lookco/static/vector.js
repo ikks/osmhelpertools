@@ -1,6 +1,8 @@
 var map;
 var waystofix;
 var hireslayer;
+var manynameslayer;
+var geocoderresults;
 
 String.prototype.format = function() {
     var formatted = this;
@@ -20,6 +22,37 @@ function colorize(feature){
     $("td[data-hiresid='" + feature.fid + "'] p").css("background-color","#CCFFCC");
 }
 
+function showthing(myfilter) {
+    $.get("/show/"+myfilter,function(result){
+        $("#feature_name").html(myfilter);
+        var coder = new OpenLayers.Format.GeoJSON({
+            'internalProjection': map.baseLayer.projection,
+            'externalProjection': new OpenLayers.Projection("EPSG:4326")
+        })
+        var features = coder.read(result);
+        var bounds;
+        if(features) {
+            if(features.constructor != Array) {
+                features = [features];
+            }
+            for(var i=0; i<features.length; ++i) {
+                if (!bounds) {
+                    bounds = features[i].geometry.getBounds();
+                } else {
+                    bounds.extend(features[i].geometry.getBounds());
+                }
+
+            }
+            waystofix.removeAllFeatures();
+            waystofix.addFeatures(features);
+            map.zoomToExtent(bounds);
+            var plural = (features.length > 1) ? 's' : '';
+        } else {
+            console.log('Server error getting names with suspicious name' + type);
+        }
+    });
+    return false;
+}
 
 function init() {
     map = new OpenLayers.Map({
@@ -38,7 +71,7 @@ function init() {
       'strokeWidth': 5,
       'strokeColor': '#FF0000'
     });
-    waystofix = new OpenLayers.Layer.Vector("Vías Nombres raros",{styleMap: styleMap});
+    waystofix = new OpenLayers.Layer.Vector("Vías Nombres raros", {styleMap: styleMap});
     
     var styleMaphires = new OpenLayers.StyleMap({
       'strokeWidth': 2,
@@ -67,10 +100,13 @@ function init() {
     map.addControl(colorthis);
     colorthis.activate();
 
-    var layers = [osm, waystofix, hireslayer, manynameslayer];
+    geocoderresults = new OpenLayers.Layer.Markers("Geo");
+
+    var layers = [osm, waystofix, hireslayer, manynameslayer, geocoderresults];
     map.addLayers(layers);
     manynameslayer.setVisibility(false);
     waystofix.setVisibility(false);
+    geocoderresults.setVisibility(false);
     hireslayer.setVisibility(true);
 
     // map.addControl(new OpenLayers.Control.LayerSwitcher());

@@ -1,34 +1,34 @@
 <!doctype html>
 <head>
-<title>Lookco</title>
-<link rel="stylesheet" href="http://test.openstreetmap.co/geoc/samples/theme/default/style.css" type="text/css">
-<link rel="stylesheet" href="http://test.openstreetmap.co/geoc/samples/theme/google.css" type="text/css">
-<link rel="stylesheet" href="http://test.openstreetmap.co/geoc/samples/style.css" type="text/css">
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="http://openlayers.org/api/2.12/OpenLayers.js"></script>
-<script src="{{ url_for('static', filename='vector.js') }}"></script>
+  <title>Lookco</title>
+  <link rel="stylesheet" href="http://test.openstreetmap.co/geoc/samples/theme/default/style.css" type="text/css">
+  <link rel="stylesheet" href="http://test.openstreetmap.co/geoc/samples/theme/google.css" type="text/css">
+  <link rel="stylesheet" href="http://test.openstreetmap.co/geoc/samples/style.css" type="text/css">
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="http://openlayers.org/api/2.12/OpenLayers.js"></script>
+  <script src="{{ url_for('static', filename='vector.js') }}"></script>
 </head>
 <body onload="init()">
-<div class=page>
-  <h1>Lookco</h1>
-  <div class=metanav>
-  {% if not session.logged_in %}
-    <a href="{{ url_for('login') }}" style="display:none;">log in</a>
-  {% else %}
-    <a href="{{ url_for('logout') }}">log out</a>
-  {% endif %}
-  </div>
+  <div class="page">
+    <h1>Lookco</h1>
+    <div class=metanav>
+    {% if not session.logged_in %}
+      <a href="{{ url_for('login') }}" style="display:none;">log in</a>
+    {% else %}
+      <a href="{{ url_for('logout') }}">log out</a>
+    {% endif %}
+    </div>
   {% for message in get_flashed_messages() %}
     <div class=flash>{{ message }}</div>
   {% endfor %}
-  {% block body %}{% endblock %}
-</div>
+    {% block body %}{% endblock %}
+  </div>
 
-<script type="text/javascript">
-{% block js %}
+  <script type="text/javascript">
+  {% block js %}
 
 
-{% endblock %}
-</script>
+  {% endblock %}
+  </script>
 </body>

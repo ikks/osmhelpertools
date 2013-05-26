@@ -1,12 +1,28 @@
 {% extends "layout.html" %}
 {% block body %}
+<div id="id_geocode_div">
+    <form>
+        <textarea id="id_sourcedirs" cols="30" rows="5">Carrera 57#66B
+Calle 150A#101
+Calle 70C#56B
+Carrera 10#86
+Calle 7B#20A
+Carrera 7B#26 Sur
+Calle 26 S#3E
+Carrera 45A#34 Sur</textarea>
+        <button id="id_geocode">-></button>
+    <form>
+</div>
+<span id="toggle_geocoder">Geocoder</span>
+
 <div id="title_info">
-<h1>Arreglos para Colombia</h1>
-<select>
-    <option value="hires">Aerofotografía para calcar</option>
-    <option value="waystofix">Vías para arreglar</option>
-    <option value="manynames">Intersección multinombrada</option>
-</select>
+    <h1>Arreglos para Colombia</h1>
+    <select>
+        <option value="">---------------</option>
+        <option value="hires" selected >Aerofotografía para calcar</option>
+        <option value="waystofix">Vías para arreglar</option>
+        <option value="manynames">Intersección multinombrada</option>
+    </select>
 <div>
     <div id="help_hires">
         <p>Estas son las zonas que tienen aerofotografía de alta resolución, tales zonas son
@@ -50,58 +66,10 @@
     </table>
     </div>
 </div>
-<div>
-    <div  id="id_geocode_div" style="display:none;">
-        <form>
-            <textarea id="id_sourcedirs" cols="30" rows="25">Carrera 57#66B
-Calle 150A#101
-Calle 70C#56B
-Carrera 10#86
-Calle 7B#20A
-Carrera 7B#26 Sur
-Calle 26 S#3E
-Carrera 45A#34 Sur</textarea>
-            <button id="id_geocode">-></button>
-            <textarea id="id_result" cols="55" rows="25">
-            </textarea>
-        <form>
-    </div>
-    <span id="toggle_geocoder">Geocoder</span>
-</div>
 {% endblock %}
 
 {% block js %}
-function showthing(myfilter) {
-    $.get("/show/"+myfilter,function(result){
-        $("#feature_name").html(myfilter);
-        var coder = new OpenLayers.Format.GeoJSON({
-            'internalProjection': map.baseLayer.projection,
-            'externalProjection': new OpenLayers.Projection("EPSG:4326")
-        })
-        var features = coder.read(result);
-        var bounds;
-        if(features) {
-            if(features.constructor != Array) {
-                features = [features];
-            }
-            for(var i=0; i<features.length; ++i) {
-                if (!bounds) {
-                    bounds = features[i].geometry.getBounds();
-                } else {
-                    bounds.extend(features[i].geometry.getBounds());
-                }
 
-            }
-            waystofix.removeAllFeatures();
-            waystofix.addFeatures(features);
-            map.zoomToExtent(bounds);
-            var plural = (features.length > 1) ? 's' : '';
-        } else {
-            console.log('Server error getting names with suspicious name' + type);
-        }
-    });
-    return false;
-}
 $(function(){
     $("select").change(function(){
         switch($("select option:selected").val()){
@@ -109,6 +77,7 @@ $(function(){
                 manynameslayer.setVisibility(false);
                 waystofix.setVisibility(false);
                 hireslayer.setVisibility(true);
+                geocoderresults.setVisibility(false);
                 $("#waystofix").hide();
                 $("#hires").show();
                 $("#help_hires").show();
@@ -121,6 +90,7 @@ $(function(){
                 waystofix.setVisibility(true);
                 hireslayer.setVisibility(false);
                 manynameslayer.setVisibility(false);
+                geocoderresults.setVisibility(false);
                 $("#waystofix").show();
                 $("#hires").hide();
                 $("#help_hires").hide();
@@ -132,6 +102,7 @@ $(function(){
                 waystofix.setVisibility(false);
                 hireslayer.setVisibility(false);
                 manynameslayer.setVisibility(true);
+                geocoderresults.setVisibility(false);
                 $("#waystofix").hide();
                 $("#help_waystofix").hide();
                 $("#hires").hide();
@@ -166,11 +137,49 @@ $('#id_geocode').click(function(){
         function(result){
             var show = ""
             var res = result.answer;
+            var vars;
+            var ll
+            var size = new OpenLayers.Size(25,41);
+            var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+            var icon = new OpenLayers.Icon('http://www.openstreetmap.org/assets/images/marker-icon.png',size,offset);
+            var changed = false;
+            bounds = new OpenLayers.Bounds();
+            geocoderresults.clearMarkers();
             for(i=0;i < res.length; i++){
-                show += res[i].incoming + ' -> ' + res[i].latlon + '\n';
+                if (res[i].latlon === undefined || res[i].latlon === null || res[i].latlon.length == 0 )
+                    continue;
+                vars = res[i].latlon.split('|');
+                for (j=0; j< vars.length; j++) {
+                    var ll = vars[j].split(',');
+
+                    if (ll.length !== 2)
+                        continue;
+                    point = new OpenLayers.LonLat(ll[1],ll[0]).transform(
+                        new OpenLayers.Projection("EPSG:4326"),
+                        map.getProjectionObject()
+                    )
+                    geocoderresults.addMarker(new OpenLayers.Marker(
+                        point,
+                        icon.clone()
+                    ));
+                    bounds.extend(point);
+                    changed = true;
+                }
             }
-            $('#id_result').val(show);
-            button.html(result.incoming + ' -> ' + result.resolved)
+            if (changed) {
+                map.zoomToExtent(bounds);
+                button.html(result.incoming + ' -> ' + result.resolved)
+                manynameslayer.setVisibility(false);
+                waystofix.setVisibility(false);
+                geocoderresults.setVisibility(true);
+                hireslayer.setVisibility(false);
+                $("select").val('');
+                $('#id_geocode_div').hide();
+            }
+            else{
+                alert('No fue posible deducir georeferencia')
+            }
+            $('#id_sourcedirs').val('');
         }
     );
    return false;
