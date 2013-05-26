@@ -158,7 +158,7 @@ $(".intersection").click(function(){
             map.getProjectionObject()
         ), 18
     );
-    $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format($(this).find("p").html(),$(this).data('lat'),$(this).data('lon')));
+    $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?editor=id&lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format($(this).find("p").html(),$(this).data('lat'),$(this).data('lon')));
 });
 $('#id_geocode').click(function(){
     var button = $('#id_geocode');
