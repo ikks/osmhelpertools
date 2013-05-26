@@ -28,6 +28,8 @@ def fillredis():
             for j in range(len(names)):
                 jth = names[j].split('|')
                 if i != j:
+                    if len(ith) > 1 and len(jth) > 1 and ith[1] == jth[1]:
+                        continue
                     try:
                         part = jth[1]
                         try:
@@ -47,6 +49,7 @@ def fillredis():
                             thing[key][key2] += "|" + value
                     except:
                         pass
+
     for keys in thing:
         for key in thing[keys]:
             pipe.hset(keys, key, thing[keys][key])

@@ -16,6 +16,7 @@ Work to be done
 [] Gecoder
   [X] Show results in map
   [] Remove too close results
+  [] Remove results that share the same name, example Carrera 5 in Bogotá
   [] Show results on right
   [] Click on results zoom to place
   [] Popup shows the incoming value
