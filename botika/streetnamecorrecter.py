@@ -193,33 +193,43 @@ def fixstreetname(oldw, updw, replacement):
 
 def fixwaynames():
     replacements = {
-        u"CARRERA|CAR|CRA|CR|KR|KRA|CRA\.|KRA\.|CARRERRA|CARREA|K|CARREAR|"
+        # CARRERA|
+        u"CAR|CRA|CR|KR|KRA|CRA\.|KRA\.|CARRERRA|CARREA|K|CARREAR|"
         u"ARRERA|CARREARA|CARRRERA|CARERRA|CARERA|CCARRERA|CARREREA|KARRERA|"
         u"CRR|CRRERA|CARRERAR|CASRRERA|CARRREA|CAARRERA|CR\.|KA|CERRERA|"
         u"CARRERQA|CARR|CQARRERA|CARRER|CARERAR": "Carrera",
 
-        u"CALLE|CL|CLL|CL\.|CALE|CALL|CALLEL|CALLOE|CLLE|CALLLE|ALLE|CELLE|"
+        # CALLE|
+        u"CL|CLL|CL\.|CALE|CALL|CALLEL|CALLOE|CLLE|CALLLE|ALLE|CELLE|"
         u"CCALLE|CLL\.|CALKLE|CALLR|CALLEM": u"Calle",
 
-        u"DIAGONAL|DG|DIAG|DIAG\.|DGN|DIAGOMAL|DIAGNNAL|DIOGONAL|DIAGOANAL|"
+        # DIAGONAL|
+        u"DG|DIAG|DIAG\.|DGN|DIAGOMAL|DIAGNNAL|DIOGONAL|DIAGOANAL|"
         u"DAIGONAL|DIG": u"Diagonal",
 
-        u"TRANSVERSAL|TR|TRANS|TV|TRAV|TRV|TRANSV\.|TRANSVEERSAL|TRA|"
+        # TRANSVERSAL|
+        u"TR|TRANS|TV|TRAV|TRV|TRANSV\.|TRANSVEERSAL|TRA|"
         u"TRANSV|TRASVERSAL|TRANVERSAL|TRANSVARSAL|TRANSVVERSAL|TRASV|"
         u"TRANAVERSAL|TRRANSVERSAL|TRASNVERSAL|TRNASVERSAL|"
         u"TRV\.": u"Transversal",
 
-        u"AVENIDA|AV\.|AV|AVDA|AVE": u"Avenida",
+        # AVENIDA|
+        u"AV\.|AV|AVDA|AVE": u"Avenida",
 
-        u"TRONCAL|TROCAL": u"Troncal",
+        # TRONCAL|
+        u"TROCAL": u"Troncal",
 
-        u"AUTOPISTA|AUTOPISTE|AUT\.": u"Autopista",
+        # AUTOPISTA|
+        u"AUTOPISTE|AUT\.": u"Autopista",
 
-        u"VÍA|VIA": u"vía",
+        # VÍA|
+        u"VIA": u"vía",
 
-        u"DESVÍO|DESVIO|DEVIO": u"Desvío",
+        # DESVÍO|
+        u"DESVIO|DEVIO": u"Desvío",
 
-        u"CIRCULAR|CIRULAR": u"Circular",
+        # CIRCULAR|
+        u"CIRULAR": u"Circular",
     }
     applychanges(
         conn,
