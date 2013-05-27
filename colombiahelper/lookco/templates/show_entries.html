@@ -24,20 +24,20 @@ Carrera 45A#34 Sur</textarea>
         <option value="manynames">Intersección multinombrada</option>
     </select>
     <div>
-        <div id="help_hires">
+        <div id="help_hires" class="help">
             <p>Estas son las zonas que tienen aerofotografía de alta resolución, tales zonas son
                 susceptibles de ser mejoradas calcando ríos, ojos de agua, carreteras, e incluso
                 casas.
         </div>
-        <div id="help_waystofix">
+        <div id="help_waystofix" class="help">
             <p>Hay vías que no tienen nombres adecuados, elija aquellas que desea arreglar en el
                 panel derecho y cuando se proyecten en color rojo, puede pasar el mouse por encima
                 de las mismas, hay opción para visualizar en osm, editar con josm o potlatch.
         </div>
-        <div id="help_manynames">
+        <div id="help_manynames" class="help">
             <p>Hay intersecciones que lucen sospechosas, puesto que hay varias vías que llegan a ellas con nombres distintos, puede ser que algunas sean erróneas y requieran ser arregladas.  Esto servirá para poder contar con un geocoder bueno para el país.
         </div>
-        <div id="help_georeference">
+        <div id="help_georeference" class="help">
             <p>Dada una porción de la dirección, se muestra aquellos sitios en los cuales los datos de openstreetmap permiten saber el sitio y las ciudades en las que está presente tal intersección. Por ejemplo, intente Calle 5#5.
         </div>
     </div>
@@ -66,7 +66,7 @@ Carrera 45A#34 Sur</textarea>
             <tr><td data-lat="{{ inter.lat }}" data-lon="{{ inter.lon }}" title="{{ inter.id }}" class="intersection"><p>{{ inter.desc }}</td></tr>
             {% endfor %}
         </table>
-        <table class="entries" id="georeference">
+        <table class="entries" id="id_georeference">
         </table>
     </div>
 </div>
@@ -118,31 +118,45 @@ $(function(){
     });
     $(".fixable_item").click(function (evt) {
         showthing($(evt.target).data('name'));
+        return false;
     });
-});
-$(".hiresitem").click(function(){
-    for (var i=0; i < hireslayer.features.length; i++){
-        if (hireslayer.features[i].fid === $(this).data('hiresid')){
-            map.zoomToExtent(hireslayer.features[i].geometry.getBounds());
-            return;
+    $(".hiresitem").click(function(evt){
+        var elem = $(evt.target).closest('td');
+        for (var i=0; i < hireslayer.features.length; i++){
+            if (hireslayer.features[i].fid === elem.data('hiresid')){
+                map.zoomToExtent(hireslayer.features[i].geometry.getBounds());
+                return;
+            }
         }
-    }
-    return false;
-});
-$(".intersection").click(function(){
-    map.moveTo(
-        new OpenLayers.LonLat($(this).data('lon'), $(this).data('lat')).transform(
-            new OpenLayers.Projection("EPSG:4326"),
-            map.getProjectionObject()
-        ), 18
-    );
-    $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?editor=id&lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format($(this).find("p").html(),$(this).data('lat'),$(this).data('lon')));
+        return false;
+    });
+    $(".intersection").click(function(evt){
+        var elem = $(evt.target).closest('td');
+        map.moveTo(
+            new OpenLayers.LonLat(elem.data('lon'), elem.data('lat')).transform(
+                new OpenLayers.Projection("EPSG:4326"),
+                map.getProjectionObject()
+            ), 18
+        );
+        $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?editor=id&lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format(elem.find("p").html(),elem.data('lat'),elem.data('lon')));
+        return false;
+    });
 
     $('#id_georeference').on('click', '.referenced', function(evt){
-        console.log($(evt.target).data('lat'));
+        var elem = $(evt.target).closest('td');
+        map.moveTo(
+            new OpenLayers.LonLat(elem.data('lon'), elem.data('lat')).transform(
+                new OpenLayers.Projection("EPSG:4326"),
+                map.getProjectionObject()
+            ), 18
+        );
+        $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?editor=id&lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format(elem.find("p").html(),elem.data('lat'),elem.data('lon')));
+        return false;
     });
-    $('#id_geocode').click(function(){
-        var button = $('#id_geocode');
+    $('#id_geocode').click(function(evt){
+        var button = $(evt.target);
+        if ($('#id_sourcedirs').val().trim().length === 0 )
+            return false;
         $.post('/geocoder', { dirs:$('#id_sourcedirs').val().toUpperCase()},
             function(result){
                 var show = ""
@@ -155,6 +169,7 @@ $(".intersection").click(function(){
                 var changed = false;
                 bounds = new OpenLayers.Bounds();
                 geocoderresults.clearMarkers();
+                $('#id_georeference').html('');
                 for(i=0;i < res.length; i++){
                     if (res[i].latlon === undefined || res[i].latlon === null || res[i].latlon.length == 0 )
                         continue;
@@ -174,7 +189,7 @@ $(".intersection").click(function(){
                         ));
                         bounds.extend(point);
                         changed = true;
-                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}" class="referenced"<p>{2}</td></tr>', ll[0], ll[1], res[i].incoming, res[i].incoming);
+                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}" class="referenced"><p>{2}</td></tr>'.format(ll[0], ll[1], res[i].incoming, res[i].incoming));
                     }
                 }
                 if (changed) {
@@ -186,6 +201,8 @@ $(".intersection").click(function(){
                     hireslayer.setVisibility(false);
                     $("select").val('');
                     $('#id_geocode_div').hide();
+                    $('#waystofix,#hires,#manynames, .help').hide();
+                    $('#georeference,#help_georeference').show();
                 }
                 else{
                     $('#georeference').html('');
@@ -196,8 +213,10 @@ $(".intersection").click(function(){
         );
        return false;
     });
-    $('#toggle_geocoder').click(function(){
+    $('#toggle_geocoder').click(function(evt){
         $('#id_geocode_div').slideToggle();
+        if ($('#id_geocode_div').is(':visible'))
+            $('#id_sourcedirs').focus();
     });
 });
 {% endblock %}

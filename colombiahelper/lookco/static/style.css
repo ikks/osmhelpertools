@@ -18,8 +18,9 @@ h2              { font-size: 1.2em; }
 .error          { background: #F0D6D6; padding: 0.5em; }
 #id_geocode_div { display:none; position:absolute; top:0; right:0;}
 
-.referenced,
 #goto,
+#toggle_geocoder,
+.referenced,
 .fixable_item,
 .hiresitem,
 .intersection	{ cursor:pointer; }
