@@ -4,7 +4,7 @@ h1, h2          { font-family: 'Georgia', serif; margin: 0; }
 h1              { border-bottom: 2px solid #eee; }
 h2              { font-size: 1.2em; }
 
-.page           { margin: 2em auto; height:700px;width: 850px; border: 5px solid #ccc;
+.page           { margin: 2em auto; height:auto;width: 850px; border: 5px solid #ccc;
                   padding: 0.8em; background: white; position:relative;}
 .entries        { list-style: none; margin: 0; padding: 0; }
 .entries li     { margin: 0.8em 1.2em; }
@@ -17,3 +17,20 @@ h2              { font-size: 1.2em; }
                   border: 1px solid #AACBE2; }
 .error          { background: #F0D6D6; padding: 0.5em; }
 #id_geocode_div { display:none; position:absolute; top:0; right:0;}
+
+.referenced,
+#goto,
+.fixable_item,
+.hiresitem,
+.intersection	{ cursor:pointer; }
+
+#help_waystofix,
+#help_manynames,
+#help_georeference,
+#waystofix { display:none; }
+
+#id_outer { width: 850px;position: relative;clear: both; }
+.smallmap { width: 600px; height: 500px; float: left; }
+#main_list { width: 200px; height: 500px; overflow: auto; float: right; }
+
+.entries p { margin: 0; padding: 0}
