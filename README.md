@@ -21,6 +21,8 @@ Work to be done
   [X] Click on results zoom to place
   [X] Popup shows the incoming value
   [] Add city to resulting address
+    [] Generar tablas de poblaciones
+    [] En el momento de crear la información de redis, colocar al final la ciudad
   [] Build a parser for humans
   [] CSS love
 
