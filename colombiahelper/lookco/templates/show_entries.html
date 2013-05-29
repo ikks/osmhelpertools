@@ -166,6 +166,7 @@ $(function(){
                 var size = new OpenLayers.Size(25,41);
                 var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
                 var icon = new OpenLayers.Icon('http://www.openstreetmap.org/assets/images/marker-icon.png',size,offset);
+                var counter = 1;
                 var changed = false;
                 bounds = new OpenLayers.Bounds();
                 geocoderresults.clearMarkers();
@@ -179,18 +180,22 @@ $(function(){
 
                         if (ll.length !== 2)
                             continue;
+                        counter += 1;
                         point = new OpenLayers.LonLat(ll[1],ll[0]).transform(
                             new OpenLayers.Projection("EPSG:4326"),
                             map.getProjectionObject()
                         )
-                        marker = new OpenLayers.Marker(point, icon.clone());
+                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}" class="referenced" data-idgeo="{3}"><p>{2}</td></tr>'.format(ll[0], ll[1], res[i].incoming, res[i].incoming, counter));
+                        var marker = new OpenLayers.Marker(point, icon.clone());
+                        marker.legend = res[i].incoming;
+                        marker.lat = ll[0];
+                        marker.lon = ll[1];
                         marker.events.register('mousedown', marker, function(evt) { 
-                            $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?editor=id&lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format(res[i].incoming,ll[0],ll[1]));
+                            $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?editor=id&lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format(evt.object.legend, evt.object.lat, evt.object.lon));
                         });
-                        geocoderresults.addMarker();
+                        geocoderresults.addMarker(marker);
                         bounds.extend(point);
                         changed = true;
-                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}" class="referenced"><p>{2}</td></tr>'.format(ll[0], ll[1], res[i].incoming, res[i].incoming));
                     }
                 }
                 if (changed) {
