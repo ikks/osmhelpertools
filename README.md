@@ -17,9 +17,10 @@ Work to be done
   [X] Show results in map
   [X] Remove too close results
   [X] Remove results that share the same name, example Carrera 5 in Bogotá
-  [] Show results on right
-  [] Click on results zoom to place
-  [] Popup shows the incoming value
+  [X] Show results on right
+  [X] Click on results zoom to place
+  [X] Popup shows the incoming value
+  [] Add city to resulting address
   [] Build a parser for humans
   [] CSS love
 
