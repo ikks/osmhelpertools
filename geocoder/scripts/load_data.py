@@ -65,7 +65,7 @@ def fillredis():
                                 value,
                                 min(
                                     disters,
-                                    key=lambda p: abs(p[1] - float(lon)) + (p[2] - float(lat)),
+                                    key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
                                 )[0],
                             )
                         elif memres[key][key2].find(value) == -1:
@@ -85,7 +85,7 @@ def fillredis():
                                     value,
                                     min(
                                         disters,
-                                        key=lambda p: abs(p[1] - float(lon)) + (p[2] - float(lat)),
+                                        key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
                                     )[0],
                                 )
                     except:
