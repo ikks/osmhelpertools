@@ -1,6 +1,12 @@
 import psycopg2
-import sys
 import redis
+
+
+query_city = """SELECT name, ST_distance(geom,
+    ST_GeomFromText('POINT({0} {1})',4326)) FROM
+    places WHERE ST_distance(geom, ST_GeomFromText(
+    'POINT({0} {1})',4326)) < 0.1 ORDER BY 2 LIMIT 1
+"""
 
 
 def fillredis():
@@ -20,14 +26,16 @@ def fillredis():
     close_factor = 0.0008
 
     r = redis.Redis(host='localhost', port=6379, db=0)
-    pipe = r.pipeline()
     conn = psycopg2.connect(
         "dbname='osm' user='osm' host='localhost' password='osm'"
     )
     cursor = conn.cursor()
+    cursor.execute("SELECT name, lat, lon from places")
+    disters = cursor.fetchall()
     cursor.execute("SELECT names,latlon FROM intersections")
-
-    for row in cursor.fetchall():
+    rows = cursor.fetchall()
+    count = 0
+    for row in rows:
         names = row[0].split(',')
         for i in range(len(names)):
             ith = names[i].split('|')
@@ -53,7 +61,17 @@ def fillredis():
                         if key not in memres:
                             memres[key] = {key2: value}
                         elif key2 not in memres[key]:
-                            memres[key][key2] = value
+                            lat, lon = value.split(',')
+                            memres[key][key2] = format(u'{0},{1}').format(
+                                value,
+                                min(
+                                    disters,
+                                    key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
+                                )[0],
+                            )
+                            count += 1
+                            if count % 1775 == 0:
+                                print count
                         elif memres[key][key2].find(value) == -1:
                             close = False
                             for previous in memres[key][key2].split('|'):
@@ -66,9 +84,22 @@ def fillredis():
                                     close = True
                                     break
                             if not close:
-                                memres[key][key2] += "|" + value
+                                lat, lon = value.split(',')
+                                memres[key][key2] += "|" + format(u'{0},{1}').format(
+                                    value,
+                                    min(
+                                        disters,
+                                        key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
+                                    )[0],
+                                )
+                                count += 1
+                                if count % 1775 == 0:
+                                    print count
                     except:
                         pass
+
+    r.flushdb()
+    pipe = r.pipeline()
 
     for keys in memres:
         for key in memres[keys]:
