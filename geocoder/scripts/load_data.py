@@ -34,7 +34,6 @@ def fillredis():
     disters = cursor.fetchall()
     cursor.execute("SELECT names,latlon FROM intersections")
     rows = cursor.fetchall()
-    count = 0
     for row in rows:
         names = row[0].split(',')
         for i in range(len(names)):
@@ -66,12 +65,9 @@ def fillredis():
                                 value,
                                 min(
                                     disters,
-                                    key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
+                                    key=lambda p: abs(p[1] - float(lon)) + (p[2] - float(lat)),
                                 )[0],
                             )
-                            count += 1
-                            if count % 1775 == 0:
-                                print count
                         elif memres[key][key2].find(value) == -1:
                             close = False
                             for previous in memres[key][key2].split('|'):
@@ -89,12 +85,9 @@ def fillredis():
                                     value,
                                     min(
                                         disters,
-                                        key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
+                                        key=lambda p: abs(p[1] - float(lon)) + (p[2] - float(lat)),
                                     )[0],
                                 )
-                                count += 1
-                                if count % 1775 == 0:
-                                    print count
                     except:
                         pass
 

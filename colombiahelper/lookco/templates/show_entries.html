@@ -185,7 +185,7 @@ $(function(){
                             new OpenLayers.Projection("EPSG:4326"),
                             map.getProjectionObject()
                         )
-                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}({4})" class="referenced" data-idgeo="{3}"><p>{2}({4})</td></tr>'.format(ll[0], ll[1], res[i].incoming, res[i].incoming, counter, ll[2]));
+                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}({4})" class="referenced" data-idgeo="{3}"><p>{2}({4})</td></tr>'.format(ll[0], ll[1], res[i].incoming, counter, ll[2]));
                         var marker = new OpenLayers.Marker(point, icon.clone());
                         marker.legend = '{0}({1})'.format(res[i].incoming, ll[2]);
                         marker.lat = ll[0];
