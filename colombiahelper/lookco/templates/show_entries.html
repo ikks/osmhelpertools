@@ -178,16 +178,16 @@ $(function(){
                     for (j=0; j< vars.length; j++) {
                         var ll = vars[j].split(',');
 
-                        if (ll.length !== 2)
+                        if (ll.length !== 3)
                             continue;
                         counter += 1;
                         point = new OpenLayers.LonLat(ll[1],ll[0]).transform(
                             new OpenLayers.Projection("EPSG:4326"),
                             map.getProjectionObject()
                         )
-                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}" class="referenced" data-idgeo="{3}"><p>{2}</td></tr>'.format(ll[0], ll[1], res[i].incoming, res[i].incoming, counter));
+                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}({4})" class="referenced" data-idgeo="{3}"><p>{2}({4})</td></tr>'.format(ll[0], ll[1], res[i].incoming, res[i].incoming, counter, ll[2]));
                         var marker = new OpenLayers.Marker(point, icon.clone());
-                        marker.legend = res[i].incoming;
+                        marker.legend = '{0}({1})'.format(res[i].incoming, ll[2]);
                         marker.lat = ll[0];
                         marker.lon = ll[1];
                         marker.events.register('mousedown', marker, function(evt) { 
