@@ -1,3 +1,6 @@
+from multiprocessing import Pool
+from multiprocessing import cpu_count
+
 import psycopg2
 import redis
 
@@ -7,6 +10,28 @@ query_city = """SELECT name, ST_distance(geom,
     places WHERE ST_distance(geom, ST_GeomFromText(
     'POINT({0} {1})',4326)) < 0.1 ORDER BY 2 LIMIT 1
 """
+
+
+def find_city(main_key, memres, disters):
+    """Finds the closest city for a dictionary of points
+    main_key is the first part of the address
+    memres is a dictionary that holds the second part of the address
+    as the key and the value is a string of lat,lon[|lat,lon]
+    disters is a list of the form city,lat,lon.
+
+    Returns an array of the form [main_key, lat,lon,city[|lat,lon,city]]
+    """
+    result = {}
+    for key in memres:
+        to_save = []
+        for elem in memres[key].split("|"):
+            lat, lon = elem.split(",")
+            to_save.append('{0},{1}'.format(elem, min(
+                disters,
+                key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
+            )[0]))
+        result[key] = "|".join(to_save)
+    return [main_key, result]
 
 
 def fillredis():
@@ -25,7 +50,6 @@ def fillredis():
     memres = {}
     close_factor = 0.0008
 
-    r = redis.Redis(host='localhost', port=6379, db=0)
     conn = psycopg2.connect(
         "dbname='osm' user='osm' host='localhost' password='osm'"
     )
@@ -61,13 +85,7 @@ def fillredis():
                             memres[key] = {key2: value}
                         elif key2 not in memres[key]:
                             lat, lon = value.split(',')
-                            memres[key][key2] = format(u'{0},{1}').format(
-                                value,
-                                min(
-                                    disters,
-                                    key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
-                                )[0],
-                            )
+                            memres[key][key2] = value
                         elif memres[key][key2].find(value) == -1:
                             close = False
                             for previous in memres[key][key2].split('|'):
@@ -81,22 +99,27 @@ def fillredis():
                                     break
                             if not close:
                                 lat, lon = value.split(',')
-                                memres[key][key2] += "|" + format(u'{0},{1}').format(
-                                    value,
-                                    min(
-                                        disters,
-                                        key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
-                                    )[0],
-                                )
+                                memres[key][key2] += u"|" + value
                     except:
                         pass
 
+    # memres holds all the intersections for redis
+
+    # The following gets the city for the found points
+    pool = Pool(processes=cpu_count() * 2)
+    result = []
+    for main_key in memres:
+        result.append(pool.apply(find_city, (main_key, memres[main_key].copy(), list(disters))))
+
+    # Once we have calculated all the cities
+    # we replace our old redis instance with the fresh values
+    r = redis.Redis(host='localhost', port=6379, db=0)
     r.flushdb()
     pipe = r.pipeline()
-
-    for keys in memres:
-        for key in memres[keys]:
-            pipe.hset(keys, key, memres[keys][key])
+    for elem in result:
+        for key in elem[1]:
+            pipe.hset(elem[0], key, elem[1][key])
     pipe.execute()
+
 
 fillredis()
