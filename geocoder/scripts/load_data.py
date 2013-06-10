@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from multiprocessing import Pool
 from multiprocessing import cpu_count
 
@@ -10,6 +11,24 @@ query_city = """SELECT name, ST_distance(geom,
     places WHERE ST_distance(geom, ST_GeomFromText(
     'POINT({0} {1})',4326)) < 0.1 ORDER BY 2 LIMIT 1
 """
+
+corrections = [
+    ['Bogotá', 4.82285, -74.07052],
+    ['Bogotá', 4.76050, -74.10459],
+    ['Bogotá', 4.74262, -74.12803],
+    ['Bogotá', 4.69463, -74.16433],
+    ['Bogotá', 4.63646, -74.20527],
+    ['Bogotá', 4.61379, -74.19008],
+    ['Bogotá', 4.59890, -74.16116],
+    ['Bogotá', 4.55544, -74.14656],
+    ['Bogotá', 4.50992, -74.10820],
+    ['Bogotá', 4.56733, -74.08039],
+    ['Bogotá', 4.61824, -74.06211],
+    ['Bogotá', 4.67607, -74.03807],
+    ['Bogotá', 4.69557, -74.02572],
+    ['Bogotá', 4.73595, -74.01713],
+    ['Bogotá', 4.80061, -74.03155],
+]
 
 
 def find_city(main_key, memres, disters):
@@ -28,7 +47,7 @@ def find_city(main_key, memres, disters):
             lat, lon = elem.split(",")
             to_save.append('{0},{1}'.format(elem, min(
                 disters,
-                key=lambda p: abs(p[1] - float(lat)) + (p[2] - float(lon)),
+                key=lambda p: abs(p[1] - float(lat)) + abs(p[2] - float(lon)),
             )[0]))
         result[key] = "|".join(to_save)
     return [main_key, result]
@@ -56,6 +75,7 @@ def fillredis():
     cursor = conn.cursor()
     cursor.execute("SELECT name, lat, lon from places")
     disters = cursor.fetchall()
+    disters.extend(corrections)
     cursor.execute("SELECT names,latlon FROM intersections")
     rows = cursor.fetchall()
     for row in rows:
