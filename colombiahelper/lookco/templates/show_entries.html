@@ -171,11 +171,11 @@ $(function(){
                 bounds = new OpenLayers.Bounds();
                 geocoderresults.clearMarkers();
                 $('#id_georeference').html('');
-                for(i=0;i < res.length; i++){
+                for(var i=0;i < res.length; i++){
                     if (res[i].latlon === undefined || res[i].latlon === null || res[i].latlon.length == 0 )
                         continue;
                     vars = res[i].latlon.split('|');
-                    for (j=0; j< vars.length; j++) {
+                    for (var j=0; j < vars.length; j++) {
                         var ll = vars[j].split(',');
 
                         if (ll.length !== 3)
@@ -185,11 +185,11 @@ $(function(){
                             new OpenLayers.Projection("EPSG:4326"),
                             map.getProjectionObject()
                         )
-                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}" class="referenced" data-idgeo="{3}"><p>{2}</td></tr>'.format(ll[0], ll[1], res[i].incoming, counter));
                         var marker = new OpenLayers.Marker(point, icon.clone());
-                        marker.legend = '{0}'.format(res[i]);
+                        marker.legend = '{0} - {1}'.format(res[i].incoming, ll[2]);
                         marker.lat = ll[0];
                         marker.lon = ll[1];
+                        $('#id_georeference').append('<tr><td data-lat="{0}" data-lon="{1}" title="{2}" class="referenced" data-idgeo="{3}"><p>{2}</td></tr>'.format(ll[0], ll[1], marker.legend, counter));
                         marker.events.register('mousedown', marker, function(evt) { 
                             $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?editor=id&lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format(evt.object.legend, evt.object.lat, evt.object.lon));
                         });
