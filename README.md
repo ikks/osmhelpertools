@@ -24,12 +24,16 @@ Work to be done
     [X] Generar tablas de poblaciones
     [X] En el momento de crear la información de redis, colocar al final la ciudad
     [X] Paralelización de proceso de ciudad más cercana
-    [] Proyectar resultados
-  [] Build a parser for humans
+    [X] Proyectar resultados
+  [] Integrate a parser for humans
   [] CSS love
 
 [] Reverse Geocoder
-    [] php to python procedure
+    [] php to python stored procedure
+       [X] Returns the possible interesection name
+       [] Returns a set of intersections with latitude longitude
+       [] Find the closest with respect to 0 City
+       [] Find distance along the line
     [] Show fields in map to reverse geocoding
     [] Click shows the name
     [] A free ride with some points

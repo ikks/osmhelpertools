@@ -26,7 +26,11 @@ psql -c "SELECT n2.id, s1.count, n2.geom, s1.names INTO inter_to_fix FROM (SELEC
 psql -c "SELECT n2.id AS id, s1.count AS cant, y(n2.geom)||','||x(n2.geom) AS latlon, s1.names AS names INTO intersections FROM (SELECT count(name), id, string_agg(name,',') AS names FROM (SELECT DISTINCT (w.tags -> 'highway') ||'|'|| (w.tags -> 'name') AS name, n.id FROM ways w, nodes n WHERE char_length(w.tags -> 'highway') > 0  AND w.tags ? 'name' AND n.id = any(w.nodes)) AS sub GROUP BY id HAVING count(name) > 1) AS s1, nodes n2 WHERE s1.id = n2.id;" $DBNAME
 psql -c "SELECT id, tags -> 'place' AS place, tags -> 'name' AS name, st_y(geom) AS lat, st_x(geom) AS lon, geom INTO lugares FROM nodes WHERE tags -> 'place' IN ('city', 'town', 'village') AND upper(tags -> 'name') NOT SIMILAR TO '(VEREDA|VDA|RESGUARDO|[0-9]%)%' ORDER BY tags -> 'name';"
 psql -c "GRANT SELECT ON ways_to_fix, inter_to_fix, intersections, places TO $DBUSER;" $DBNAME
+psql -c "CREATE EXTENSION plpythonu;" $DBNAME
+psql -f reversegeo.sql $DBNAME
 psql -c "DROP DATABASE "$OLDDB";" template1 && psql -c "ALTER DATABASE "$DBNAME" RENAME TO "$OLDDB";" template1
 rm "$COUNTRY".osm
 redis-cli flushdb
 python load_data.py
+
+
