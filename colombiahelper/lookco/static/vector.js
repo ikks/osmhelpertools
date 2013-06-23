@@ -42,14 +42,22 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
             map.getProjectionObject(),
             new OpenLayers.Projection("EPSG:4326")
         );
-        if ($("#id_dothis").val() === "2") {
-            document.getElementById("thearea").value += "http://www.openstreetmap.org/?mlat="+lonlat.lat.toFixed(5)+"&mlon="+lonlat.lon.toFixed(5)+"&zoom=18&layers=M\n"
-        }
-        else if ($("#id_dothis").val() === "1") {
-            document.getElementById("thearea").value+=lonlat.lat.toFixed(5)+","+lonlat.lon.toFixed(5)+"\n";
-        }
-        else {
-            document.getElementById("thearea").value += "ST_GeomFromText('POINT(" + lonlat.lon.toFixed(5) + " " + lonlat.lat.toFixed(5) + ")',4326)\n";
+        switch($("#id_dothis").val()){
+            case "marker":
+                $("#thearea").append("http://www.openstreetmap.org/?mlat={0}&mlon={1}&zoom=18&layers=M\n".format(
+                    lonlat.lat.toFixed(5),
+                    lonlat.lon.toFixed(5))
+                );
+                break;
+            case "simple":
+                $("#thearea").append(lonlat.lat.toFixed(5) + "," + lonlat.lon.toFixed(5)+"\n");
+                break;
+            case "wkt":
+                $("#thearea").append("ST_GeomFromText('POINT({0} {1})',4326)\n".format(lonlat.lon.toFixed(5), lonlat.lat.toFixed(5)));
+                break;
+            case "inversegeo":
+                console.log("hola");
+                break;
         }
     }
 
