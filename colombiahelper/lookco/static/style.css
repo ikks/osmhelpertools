@@ -28,7 +28,10 @@ h2              { font-size: 1.2em; }
 #help_waystofix,
 #help_manynames,
 #help_georeference,
+#help_inverse,
+#id_geoinverse,
 #waystofix { display:none; }
+
 
 #id_outer { width: 850px;position: relative;clear: both; }
 .smallmap { width: 600px; height: 500px; float: left; }

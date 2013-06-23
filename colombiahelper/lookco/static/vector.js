@@ -13,6 +13,48 @@ String.prototype.format = function() {
     return formatted;
 };
 
+OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {                
+    defaultHandlerOptions: {
+        'single': true,
+        'double': false,
+        'pixelTolerance': 0,
+        'stopSingle': false,
+        'stopDouble': false
+    },
+
+    initialize: function(options) {
+        this.handlerOptions = OpenLayers.Util.extend(
+            {}, this.defaultHandlerOptions
+        );
+        OpenLayers.Control.prototype.initialize.apply(
+            this, arguments
+        ); 
+        this.handler = new OpenLayers.Handler.Click(
+            this, {
+                'click': this.trigger
+            }, this.handlerOptions
+        );
+    }, 
+
+    trigger: function(e) {
+        var lonlat = map.getLonLatFromViewPortPx(e.xy);
+        var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(
+            map.getProjectionObject(),
+            new OpenLayers.Projection("EPSG:4326")
+        );
+        if ($("#id_dothis").val() === "2") {
+            document.getElementById("thearea").value += "http://www.openstreetmap.org/?mlat="+lonlat.lat.toFixed(5)+"&mlon="+lonlat.lon.toFixed(5)+"&zoom=18&layers=M\n"
+        }
+        else if ($("#id_dothis").val() === "1") {
+            document.getElementById("thearea").value+=lonlat.lat.toFixed(5)+","+lonlat.lon.toFixed(5)+"\n";
+        }
+        else {
+            document.getElementById("thearea").value += "ST_GeomFromText('POINT(" + lonlat.lon.toFixed(5) + " " + lonlat.lat.toFixed(5) + ")',4326)\n";
+        }
+    }
+
+});
+
 function showInfo(feature) {
     $("#info_detail").html('{0} [ <a href="http://www.openstreetmap.org/?mlat={1}&mlon={2}&zoom=17" target="_blank">Ver</a> | <a href="http://www.openstreetmap.org/edit?lat={1}&lon={2}&zoom=17" target="_blank">Editar</a> | <a href="http://www.openstreetmap.org/edit?editor=remote&lat={1}&lon={2}&zoom=17">JOSM</a> ]'.format(feature.data.name,feature.data.middle.coordinates[1],feature.data.middle.coordinates[0]));
 }
@@ -122,6 +164,10 @@ function init() {
          :new OpenLayers.Projection("EPSG:4326")
     }));
 
+    var click = new OpenLayers.Control.Click();
+    map.addControl(click);
+    click.activate();
+
     $("#goto").click(function() {
         map.moveTo(
             new OpenLayers.LonLat(-74.11128,4.61799).transform(
@@ -181,5 +227,6 @@ function init() {
             console.log('Server error for intersections' + type);
         }
     });
-    waystofix.setVisibility(false);
+
+
 }

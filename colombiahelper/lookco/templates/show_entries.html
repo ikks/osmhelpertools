@@ -17,7 +17,7 @@ Carrera 45A#34 Sur</textarea>
 
 <div id="title_info">
     <h1>Arreglos para Colombia</h1>
-    <select>
+    <select class="main">
         <option value="">---------------</option>
         <option value="hires" selected >Aerofotografía para calcar</option>
         <option value="waystofix">Vías para arreglar</option>
@@ -85,18 +85,19 @@ Carrera 45A#34 Sur</textarea>
 {% endblock %}
 
 {% block js %}
-
+<script type="text/javascript">
 $(function(){
-    $("select").change(function(){
+    $("select.main").change(function(){
+        if ($("select option:selected").val() === "")
+            return;
+        $("div.help,.entries").hide();
         switch($("select option:selected").val()){
             case "hires":
                 manynameslayer.setVisibility(false);
                 waystofix.setVisibility(false);
                 hireslayer.setVisibility(true);
                 geocoderresults.setVisibility(false);
-                $("div.help,.entries").hide();
-                $("#hires").show();
-                $("#help_hires").show();
+                $("#hires,#help_hires").show();
                 $("#goto").click();
                 break;
             case "waystofix":
@@ -104,27 +105,21 @@ $(function(){
                 hireslayer.setVisibility(false);
                 manynameslayer.setVisibility(false);
                 geocoderresults.setVisibility(false);
-                $("div.help,.entries").hide();
-                $("#waystofix").show();
-                $("#help_waystofix").show();
+                $("#waystofix,#help_waystofix").show();
                 break;
             case "manynames":
                 waystofix.setVisibility(false);
                 hireslayer.setVisibility(false);
                 manynameslayer.setVisibility(true);
                 geocoderresults.setVisibility(false);
-                $("div.help,.entries").hide();
-                $("#manynames").show();
-                $("#help_manynames").show();
+                $("#manynames,#help_manynames").show();
                 break;
             case "inversegeo":
                 waystofix.setVisibility(false);
                 hireslayer.setVisibility(false);
                 manynameslayer.setVisibility(false);
                 geocoderresults.setVisibility(false);
-                $("div.help,.entries").hide();
-                $("#id_geoinverse").show();
-                $("#help_inverse").show();
+                $("#id_geoinverse,#help_inverse").show();
                 break;
         }
     });
@@ -215,8 +210,8 @@ $(function(){
                     button.html(result.incoming + ' -> ' + result.resolved)
                     manynameslayer.setVisibility(false);
                     waystofix.setVisibility(false);
-                    geocoderresults.setVisibility(true);
                     hireslayer.setVisibility(false);
+                    geocoderresults.setVisibility(true);
                     $("select").val('');
                     $('#id_geocode_div').hide();
                     $('#waystofix,#hires,#manynames, .help').hide();
@@ -237,4 +232,5 @@ $(function(){
             $('#id_sourcedirs').focus();
     });
 });
+</script>
 {% endblock %}
