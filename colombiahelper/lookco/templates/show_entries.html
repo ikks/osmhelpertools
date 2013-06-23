@@ -22,6 +22,7 @@ Carrera 45A#34 Sur</textarea>
         <option value="hires" selected >Aerofotografía para calcar</option>
         <option value="waystofix">Vías para arreglar</option>
         <option value="manynames">Intersección multinombrada</option>
+        <option value="inversegeo">Georeferencia inversa</option>
     </select>
     <div>
         <div id="help_hires" class="help">
@@ -39,6 +40,14 @@ Carrera 45A#34 Sur</textarea>
         </div>
         <div id="help_georeference" class="help">
             <p>Dada una porción de la dirección, se muestra aquellos sitios en los cuales los datos de openstreetmap permiten saber el sitio y las ciudades en las que está presente tal intersección. Por ejemplo, intente Calle 5#5.
+        </div>
+        <div id="help_inverse" class="help">
+            <p>Cuando hace click en alguna posición del mapa, puede obtener la georeferencia inversa u otro tipo de información que le puede ser útil para tratar con la latitud,longitud.
+            <select id="id_dothis">
+                  <option value="1">Simple</option>
+                  <option value="2">OSM marker</option>
+                  <option value="3">WKT</option>
+            </select>
         </div>
     </div>
     <h2 id="feature_name"></h2>
@@ -68,6 +77,9 @@ Carrera 45A#34 Sur</textarea>
         </table>
         <table class="entries" id="id_georeference">
         </table>
+        <div class="entries" id="id_geoinverse">
+            <form><textarea id="thearea" rows="40" cols="80"></textarea></form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -82,12 +94,9 @@ $(function(){
                 waystofix.setVisibility(false);
                 hireslayer.setVisibility(true);
                 geocoderresults.setVisibility(false);
-                $("#waystofix").hide();
+                $("div.help,.entries").hide();
                 $("#hires").show();
                 $("#help_hires").show();
-                $("#help_waystofix").hide();
-                $("#manynames").hide();
-                $("#help_manynames").hide();
                 $("#goto").click();
                 break;
             case "waystofix":
@@ -95,24 +104,27 @@ $(function(){
                 hireslayer.setVisibility(false);
                 manynameslayer.setVisibility(false);
                 geocoderresults.setVisibility(false);
+                $("div.help,.entries").hide();
                 $("#waystofix").show();
-                $("#hires").hide();
-                $("#help_hires").hide();
                 $("#help_waystofix").show();
-                $("#manynames").hide();
-                $("#help_manynames").hide();
                 break;
             case "manynames":
                 waystofix.setVisibility(false);
                 hireslayer.setVisibility(false);
                 manynameslayer.setVisibility(true);
                 geocoderresults.setVisibility(false);
-                $("#waystofix").hide();
-                $("#help_waystofix").hide();
-                $("#hires").hide();
-                $("#help_hires").hide();
+                $("div.help,.entries").hide();
                 $("#manynames").show();
                 $("#help_manynames").show();
+                break;
+            case "inversegeo":
+                waystofix.setVisibility(false);
+                hireslayer.setVisibility(false);
+                manynameslayer.setVisibility(false);
+                geocoderresults.setVisibility(false);
+                $("div.help,.entries").hide();
+                $("#id_geoinverse").show();
+                $("#help_inverse").show();
                 break;
         }
     });
