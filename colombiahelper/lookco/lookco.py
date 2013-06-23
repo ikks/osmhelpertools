@@ -30,7 +30,7 @@ DATABASE = "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(
     "localhost",
     "osm"
 )
-DEBUG = True
+DEBUG = False
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
@@ -99,6 +99,23 @@ def geocoder():
             'incoming': count,
             'resolved': resolved,
         }),
+        status=200,
+        mimetype="application/json"
+    )
+
+
+@app.route('/inversegeocoder', methods=['POST'])
+def reverse():
+    lat = request.form.get('lat', 4.74828)
+    lon = request.form.get('lon', -74.09152)
+    q = "SELECT reversegeo(%s, %s);"
+    g.db.execute(q, (lat, lon))
+    row = g.db.fetchone()[0]
+    result = '{0},{1} halp!!!'.format(lat, lon)
+    if row:
+        result = row
+    return Response(
+        response=dumps([result]),
         status=200,
         mimetype="application/json"
     )

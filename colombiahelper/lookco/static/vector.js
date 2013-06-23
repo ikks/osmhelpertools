@@ -42,23 +42,48 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
             map.getProjectionObject(),
             new OpenLayers.Projection("EPSG:4326")
         );
+        var calculated = ""
         switch($("#id_dothis").val()){
             case "marker":
-                $("#thearea").append("http://www.openstreetmap.org/?mlat={0}&mlon={1}&zoom=18&layers=M\n".format(
+                calculated = "http://www.openstreetmap.org/?mlat={0}&mlon={1}&zoom=18&layers=M\n".format(
                     lonlat.lat.toFixed(5),
-                    lonlat.lon.toFixed(5))
+                    lonlat.lon.toFixed(5)
                 );
                 break;
             case "simple":
-                $("#thearea").append(lonlat.lat.toFixed(5) + "," + lonlat.lon.toFixed(5)+"\n");
+                calculated = lonlat.lat.toFixed(5) + "," + lonlat.lon.toFixed(5)+"\n";
                 break;
             case "wkt":
-                $("#thearea").append("ST_GeomFromText('POINT({0} {1})',4326)\n".format(lonlat.lon.toFixed(5), lonlat.lat.toFixed(5)));
+                calculated = "ST_GeomFromText('POINT({0} {1})',4326)\n".format(
+                    lonlat.lon.toFixed(5),
+                    lonlat.lat.toFixed(5)
+                );
                 break;
             case "inversegeo":
-                console.log("hola");
+                $.post("/inversegeocoder", { lat: lonlat.lat.toFixed(7), lon: lonlat.lon.toFixed(7)}, function(incoming){
+                    if(typeof(incoming) !== "string"){
+                        result = incoming[0] + "\n";
+                        if (result.indexOf("#") === -1){
+                            calculated = result;
+                        }
+                        else{
+                            pair = result.split('#')
+                            if (pair[1].length == 0)
+                                calculated = pair[0] + "\n";
+                            else if (pair[1].indexOf(",") === -1){
+                                calculated = result;
+                            }
+                            else {
+                                compl = pair[1].split(',');
+                                calculated = "{0} entre {1} y {2}".format(pair[0], compl[0], compl[1])
+                            }
+                        }
+                    }
+                    $("#thearea").append(calculated);
+                })
                 break;
         }
+        $("#thearea").append(calculated);
     }
 
 });
