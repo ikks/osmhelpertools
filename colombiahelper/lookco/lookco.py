@@ -30,7 +30,7 @@ DATABASE = "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(
     "localhost",
     "osm"
 )
-DEBUG = False
+DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
