@@ -31,12 +31,35 @@ Work to be done
 [] Reverse Geocoder
     [] php to python stored procedure
        [X] Returns the possible interesection name
-       [] Returns a set of intersections with latitude longitude
+       [X] Returns a set of intersections with latitude longitude
        [] Find the closest with respect to 0 City
        [] Find distance along the line
-    [] Show fields in map to reverse geocoding
-    [] Click shows the name
-    [] A free ride with some points
+    [X] Show fields in map to reverse geocoding
+    [X] Click shows the name
+    [] Return a better structure
+    [] Store in a table failed reverse geocodings - Requires better update
+    [] Store in a table failed geocoding - Requires better update
 
+[X] Helper tools
+  [] Show ways whose name is missing
+    [] Requires zoom level to change according to map browse
+    [] Find totals
 
+[] Smarter update process
+  [] Drop tables instead of database
 
+[] Gamification
+  [] Login related to OSM
+  [] If you help, you can use some tools
+  [] Table points
+    [] You are registered
+    [] You have edited recently
+    [] You have edited
+    [] You have uploaded a trace
+    [] You have uploaded a trace recently
+    [] You are XXXXXX
+    [] You created an entry diary
+    [] You created an entry diary
+    [] You are registered in talk-co
+    [] You have closed notes
+    [] You have closed notes recently
