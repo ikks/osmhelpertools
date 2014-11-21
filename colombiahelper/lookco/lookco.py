@@ -60,7 +60,7 @@ def teardown_request(exception):
 def show_entries():
     g.db.execute("SELECT count(*) AS cant,initial AS name FROM ways_to_fix GROUP BY 2  HAVING count(*) < 500 ORDER BY cant DESC,initial")
     entries = [{'cant': row[0], 'name': row[1].capitalize() if row[1] != u'' else u'Varios'} for row in g.db.fetchall()]
-    g.db.execute("SELECT id, COALESCE(tags -> 'name', tags -> 'note', tags -> 'description', tags -> 'source', '') AS name, st_asgeojson(linestring) FROM ways WHERE tags ? 'hires' ORDER BY 2;")
+    g.db.execute("SELECT id, COALESCE(tags -> 'name', tags -> 'note', tags -> 'description', tags -> 'comment', tags -> 'source', '') AS name, st_asgeojson(linestring) FROM ways WHERE tags ? 'hires' ORDER BY 2;")
     hires = [{'id': row[0], 'desc': row[1]} for row in g.db.fetchall()]
     g.db.execute("SELECT id, count, x(geom), y(geom), names FROM inter_to_fix;")
     intersections = [{'id': row[0], 'desc': row[4], 'lat':row[3], 'lon':row[2]} for row in g.db.fetchall()]
