@@ -1,6 +1,6 @@
-Flask==0.8
+Flask==0.10
 Flask-SQLAlchemy==0.16
-psycopg2==2.4.5
+psycopg2==2.5.4
 vectorformats==0.1
 hiredis==0.1.1
 redis==2.7.2
