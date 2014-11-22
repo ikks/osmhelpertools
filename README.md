@@ -9,7 +9,7 @@ The following tools are provided to help with OSM
 
 # Work to be done
 
-- [] Gecoder
+- [ ] Gecoder
   - [X] Show results in map
   - [X] Remove too close results
   - [X] Remove results that share the same name, example Carrera 5 in Bogotá
@@ -21,44 +21,44 @@ The following tools are provided to help with OSM
     - [X] When adding information to redis, put city at the end
     - [X] Paralelización de proceso de ciudad más cercana
     - [X] Proyectar resultados
-  - [] Integrate a parser for humans
-  - [] CSS love
+  - [ ] Integrate a parser for humans
+  - [ ] CSS love
 
-- [] Reverse Geocoder
-    - [] php to python stored procedure
+- [ ] Reverse Geocoder
+    - [ ] php to python stored procedure
        - [X] Returns the possible interesection name
        - [X] Returns a set of intersections with latitude longitude
-       - [] Find the closest with respect to 0 City
-       - [] Find distance along the line
+       - [ ] Find the closest with respect to 0 City
+       - [ ] Find distance along the line
     - [X] Show fields in map to reverse geocoding
     - [X] Click shows the name
-    - [] Return a better structure
-    - [] Store in a table failed reverse geocodings - Requires better update
-    - [] Store in a table failed geocoding - Requires better update
+    - [ ] Return a better structure
+    - [ ] Store in a table failed reverse geocodings - Requires better update
+    - [ ] Store in a table failed geocoding - Requires better update
 
 - [X] Helper tools
-  - [] Show ways whose name is missing
-    - [] Requires zoom level to change according to map browse
-    - [] Find totals
+  - [ ] Show ways whose name is missing
+    - [ ] Requires zoom level to change according to map browse
+    - [ ] Find totals
 
-- [] Smarter update process
-  - [] Drop tables instead of database
+- [ ] Smarter update process
+  - [ ] Drop tables instead of database
 
-- [] Gamification
-  - [] Login related to OSM
-  - [] If you help, you can use some tools
-  - [] Table points
-    - [] You are registered
-    - [] You have edited recently
-    - [] You have edited
-    - [] You have uploaded a trace
-    - [] You have uploaded a trace recently
-    - [] You are XXXXXX
-    - [] You created an entry diary
-    - [] You created an entry diary
-    - [] You are registered in talk-co
-    - [] You have closed notes
-    - [] You have closed notes recently
+- [ ] Gamification
+  - [ ] Login related to OSM
+  - [ ] If you help, you can use some tools
+  - [ ] Table points
+    - [ ] You are registered
+    - [ ] You have edited recently
+    - [ ] You have edited
+    - [ ] You have uploaded a trace
+    - [ ] You have uploaded a trace recently
+    - [ ] You are XXXXXX
+    - [ ] You created an entry diary
+    - [ ] You created an entry diary
+    - [ ] You are registered in talk-co
+    - [ ] You have closed notes
+    - [ ] You have closed notes recently
 
 # Contributors
 
