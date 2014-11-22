@@ -58,7 +58,7 @@ Carrera 45A#34 Sur</textarea>
 <div id="outer" >
     <div id="map" class="smallmap"></div>
     <div id="main_list">
-        <table class="entries" id="waystofix">
+        <table class="entries" id="waystofix" style="display:none">
             <tr><th>Tipo</th><th>Características</th>
               {% for entry in entries %}
                 <tr><td><a class="fixable_item" data-name="{{ entry.name }}">{{ entry.name }}</a></td><td>{{ entry.cant }}</td></tr>
@@ -71,14 +71,14 @@ Carrera 45A#34 Sur</textarea>
             <tr><td data-hiresid="{{ poly.id }}" title="{{ poly.id }}" class="hiresitem"><p>{{ poly.desc }}</td></tr>
             {% endfor %}
         </table>
-        <table class="entries" id="manynames">
+        <table class="entries" id="manynames" style="display:none">
             {% for inter in intersections %}
             <tr><td data-lat="{{ inter.lat }}" data-lon="{{ inter.lon }}" title="{{ inter.id }}" class="intersection"><p>{{ inter.desc }}</td></tr>
             {% endfor %}
         </table>
-        <table class="entries" id="id_georeference">
+        <table class="entries" id="id_georeference" style="display:none">
         </table>
-        <div class="entries" id="id_geoinverse">
+        <div class="entries" id="id_geoinverse" style="display:none">
             <form><textarea id="thearea" rows="40" cols="80"></textarea></form>
         </div>
     </div>
