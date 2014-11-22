@@ -34,11 +34,15 @@ DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
+GA_CODE = ''
+REDIS_SERVER_CONF = "localhost"
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+app.config.from_envvar('OSM_HELPER_CONF')
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-r_server = redis.Redis("localhost")
+r_server = redis.Redis(REDIS_SERVER_CONF)
 
 
 def connect_db():
@@ -68,7 +72,7 @@ def show_entries():
         'show_entries.html',
         entries=entries,
         hires=hires,
-        intersections=intersections
+        intersections=intersections,
     )
 
 
